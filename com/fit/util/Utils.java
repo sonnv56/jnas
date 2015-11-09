@@ -16,7 +16,7 @@ public class Utils {
 	 * @return noi dung file
 	 */
 	public static String readFileContent(String filePath) throws IOException {
-		StringBuilder fileData = new StringBuilder(1000);
+		StringBuilder fileData = new StringBuilder(3000);
 		BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
 		char[] buf = new char[10];
