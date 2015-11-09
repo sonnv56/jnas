@@ -4,14 +4,14 @@ import java.io.IOException;
 
 import com.fit.object.ClassNode;
 import com.fit.object.Node;
-import com.fit.util.Util;
+import com.fit.util.Utils;
 
 public class ManagedBeanCondition extends Condition {
 	@Override
 	public boolean isStatisfiabe(Node n) {
 		if (n instanceof ClassNode) {
 			try {
-				String fileContent = Util.readFileContent(n.getPath());
+				String fileContent = Utils.readFileContent(n.getPath());
 				if (fileContent.indexOf("@ManagedBean")!=-1){
 					return true;
 				}

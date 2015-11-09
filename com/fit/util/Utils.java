@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Bo thu vien cac tinh nang
  */
-public class Util {
+public class Utils {
 	/**
 	 * Doc noi dung file java hoac xhtml, xml, jsp
 	 * 
