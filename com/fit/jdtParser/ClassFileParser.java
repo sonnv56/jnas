@@ -2,7 +2,7 @@ package com.fit.jdtParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
+import java.util.List;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -15,15 +15,25 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import com.fit.object.Node;
 import com.fit.util.Utils;
 
-public class ClassFileParser implements IJdtParser {
+/**
+ * Phan tich file .java lay thong tin can thiet
+ * 
+ * @author DucAnh
+ *
+ */
+public class ClassFileParser extends Object implements IJdtParser {
 
-	private ArrayList<MethodDeclaration> listMethodDeclaration = new ArrayList<MethodDeclaration>();
-	private ArrayList<FieldDeclaration> listFieldDeclaration = new ArrayList<FieldDeclaration>();
-	private ArrayList<ASTNode> listAnnotation = new ArrayList<ASTNode>();
+	private List<MethodDeclaration> listMethodDeclaration = new ArrayList<MethodDeclaration>();
+	private List<FieldDeclaration> listFieldDeclaration = new ArrayList<FieldDeclaration>();
+	private List<ASTNode> listAnnotation = new ArrayList<ASTNode>();
+	private Type extendClass;
+	private List<TypeDeclaration> interfaces = new ArrayList<TypeDeclaration>();
 
 	public ClassFileParser(Node classNode) {
 		try {
@@ -88,18 +98,31 @@ public class ClassFileParser implements IJdtParser {
 				listAnnotation.add(annotation);
 				return true;
 			}
+
+			public boolean visit(TypeDeclaration classDeclaration) {
+				interfaces = classDeclaration.superInterfaceTypes();
+				extendClass = classDeclaration.getSuperclassType();
+				return true;
+			}
 		});
 	}
 
-	public ArrayList<ASTNode> getListAnnotation() {
+	public List<ASTNode> getListAnnotation() {
 		return listAnnotation;
 	}
 
-	public ArrayList<FieldDeclaration> getListFieldDeclaration() {
+	public List<FieldDeclaration> getListFieldDeclaration() {
 		return listFieldDeclaration;
 	}
 
-	public ArrayList<MethodDeclaration> getListMethodDeclaration() {
+	public List<MethodDeclaration> getListMethodDeclaration() {
 		return listMethodDeclaration;
+	}
+
+	public List<TypeDeclaration> getInterfaces() {
+		return interfaces;
+	}
+	public Type getExtendClass() {
+		return extendClass;
 	}
 }

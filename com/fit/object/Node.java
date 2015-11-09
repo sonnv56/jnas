@@ -91,4 +91,17 @@ public abstract class Node {
 	public List<Node> getChildren() {
 		return children;
 	}
+
+	/**
+	 * Phan tich duong dan tuyet doi de lay ten file
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public String getNodeName() {
+		final String DELIMITER_BETWEEN_COMPOPNENT_TYPE1 = "\\";
+		final String DELIMITER_BETWEEN_COMPOPNENT_TYPE2 = "/";
+		String tmpPath = path.replace(DELIMITER_BETWEEN_COMPOPNENT_TYPE1, DELIMITER_BETWEEN_COMPOPNENT_TYPE2);
+		return tmpPath.substring(tmpPath.lastIndexOf(DELIMITER_BETWEEN_COMPOPNENT_TYPE2) + 1, tmpPath.length());
+	}
 }
