@@ -1,4 +1,4 @@
-package com.fit.cdi.condition;
+package com.fit.process.cdi.condition;
 
 import java.io.IOException;
 
@@ -10,9 +10,10 @@ import com.fit.util.Utils;
  * @author son
  * Dieu kien kiem tra CDI anotation Name
  * */
-public class CDINamedCondition extends Condition {
+public class CDIQualifierCondition extends Condition {
 	/**Anotation Named*/
-	private static String NAMED_ANOTATION = "@Named";
+	private static String QUALIFIER_ANOTATION = "@Qualifier";
+	private static String INTERFACE_ANOTATION = "@interface";
 	@Override
 	public boolean isStatisfiabe(Node n) {
 		if (n instanceof ClassNode) {
@@ -20,12 +21,10 @@ public class CDINamedCondition extends Condition {
 				//Doc file java
 				String fileContent = Utils.readFileContent(n.getPath());
 				//Lay vi tri cua anotation Named
-				int index = fileContent.indexOf(NAMED_ANOTATION);
-				//Vi tri ngay gan anotation Named
-				char nextToAnotation = fileContent.charAt(index+NAMED_ANOTATION.length());
+				int index = fileContent.indexOf(QUALIFIER_ANOTATION);
+				int index2 = fileContent.indexOf(INTERFACE_ANOTATION);
 				//Kiem tra 
-				if (index!=-1 && !Character.isAlphabetic(nextToAnotation) 
-						&& !Character.isDigit(nextToAnotation)){
+				if (index!=-1 && index2!=-1){
 					return true;
 				}
 			} catch (IOException e) {

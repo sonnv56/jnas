@@ -1,4 +1,4 @@
-package com.fit.cdi;
+package com.fit.process.cdi;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,15 +10,15 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
-import com.fit.cdi.condition.CDICustomQualifierCondition;
-import com.fit.cdi.condition.CDIDefaultCondition;
-import com.fit.cdi.condition.CDINamedCondition;
-import com.fit.cdi.condition.CDIQualifierCondition;
 import com.fit.jdtParser.ClassFileParser;
 import com.fit.loader.ProjectLoader;
 import com.fit.loader.tree.Search;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
+import com.fit.process.cdi.condition.CDICustomQualifierCondition;
+import com.fit.process.cdi.condition.CDIDefaultCondition;
+import com.fit.process.cdi.condition.CDINamedCondition;
+import com.fit.process.cdi.condition.CDIQualifierCondition;
 import com.fit.util.Utils;
 
 /**

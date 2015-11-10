@@ -1,4 +1,4 @@
-package com.fit.cdi.condition;
+package com.fit.process.cdi.condition;
 
 import java.io.IOException;
 
