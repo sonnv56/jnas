@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.fit.object.Node;
+
 /**
  * Bo thu vien cac tinh nang
  */
@@ -29,4 +31,30 @@ public class Utils {
 		reader.close();
 		return fileData.toString();
 	}
+<<<<<<< HEAD
+<<<<<<< HEAD
+	
+	public static String getParentOfANode(Node node) {
+		String parentName = "";
+		try {
+			String fileContent = Utils.readFileContent(node.getPath());
+			int template = fileContent.indexOf("class");
+			int index1 = fileContent.indexOf("extends", template) + "extends".length();
+			if(index1 =="extends".length()-1){
+				index1 = fileContent.indexOf("implements", template)+"implements".length();
+			}
+			int index2 = fileContent.indexOf("{", index1);
+			parentName = fileContent.substring(index1, index2).trim();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return parentName;
+	}
+
 }
+=======
+}
+>>>>>>> 98aeb8eeef2c57ec8d8e628c49c73764dc9b3698
+=======
+}
+>>>>>>> 98aeb8eeef2c57ec8d8e628c49c73764dc9b3698
