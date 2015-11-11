@@ -25,8 +25,6 @@ import com.fit.util.Utils;
  * @author son Bo xu ly CDI trong project J2EE
  * */
 public class CDIProcessor {
-	/** Anotation Inject */
-	private static final String INJECT_ANOTATION = "@Inject";
 	/** RX cho injection point khai bao mac dinh */
 	private static final String DECLARATION_DEFAULT_CASE_PATTERN = "(@Inject )(?!@).*?(;)";
 	/** RX cho injection point khai bao mac dinh */
@@ -35,7 +33,8 @@ public class CDIProcessor {
 	private ProjectNode projectNode;
 
 	public static void main(String[] args) {
-		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
+		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
+//		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 		CDIProcessor processor = new CDIProcessor();
 		processor.setProjectNode(projectNode);
@@ -48,12 +47,9 @@ public class CDIProcessor {
 	 * Phuong thuc xu ly chinh
 	 * */
 	public void process() {
-		List<Node> namedNodes = Search.searchNode(projectNode,
-				new CDINamedCondition());
-		List<Node> qualifiers = Search.searchNode(projectNode,
-				new CDIQualifierCondition());
-		List<Node> defaultNodes = Search.searchNode(projectNode,
-				new CDIDefaultCondition());
+		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
+		List<Node> qualifiers = Search.searchNode(projectNode, new CDIQualifierCondition());
+		List<Node> defaultNodes = Search.searchNode(projectNode, new CDIDefaultCondition());
 		// Xu ly cach quy dinh 1
 		applyCDIContextWithDefault(namedNodes, defaultNodes);
 		// Xy ly cach quy dinh 2
@@ -72,14 +68,13 @@ public class CDIProcessor {
 			List<String> qulifiersAnotation) {
 		for (String qualifier : qulifiersAnotation) {
 			// Xac dinh candidate
-			List<Node> qualifiers = Search.searchNode(projectNode,
-					new CDICustomQualifierCondition(qualifier));
+			List<Node> qualifiers = Search.searchNode(projectNode,new CDICustomQualifierCondition(qualifier));
 			for (Node node : qualifiers) {
 				// Xac dinh injection point
-				List<Node> whoUseParent = findQualifierCase(qualifier,
-						namedNodes);
-				for (Node node2 : whoUseParent)
+				List<Node> whoUseParent = findQualifierCase(qualifier,namedNodes);
+				for (Node node2 : whoUseParent){
 					createAConnectInProjectTree(node, node2);
+				}
 			}
 		}
 	}
@@ -95,8 +90,7 @@ public class CDIProcessor {
 		String qualifierPattern2 = USAGE_DEFAULT_CASE_PATTERN.replace("(?!@)", "(@" + qualifier + " )");
 		List<Node> nodes = new ArrayList<Node>();
 		for (Node node : namedNodes) {
-			ClassFileParser classFileParser = new ClassFileParser(
-					node.getPath());
+			ClassFileParser classFileParser = new ClassFileParser(node.getPath());
 			boolean isAUser = false;
 			// Kiem tra cac field
 			Pattern pa = Pattern.compile(qualifierPattern1);
@@ -104,7 +98,7 @@ public class CDIProcessor {
 			for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
 				m = pa.matcher(field.toString().trim().replace("\n", "").replace("\r", ""));
 				if (m.matches()) {
-					System.out.println("Declaration");
+					System.out.println("Qualifier Declaration");
 					isAUser = true;
 				}
 			}
@@ -114,8 +108,8 @@ public class CDIProcessor {
 			for (MethodDeclaration method : classFileParser.getListMethodDeclaration()) {
 				m = pa.matcher(method.toString().trim().replace("\n", "").replace("\r", ""));
 				if (m.matches()) {
-					System.out.println("Use");
 					isAUser = true;
+					System.out.println("Qualifier Use");
 				}
 			}
 
@@ -165,8 +159,7 @@ public class CDIProcessor {
 	 * @param node
 	 * */
 	private void createAConnectInProjectTree(Node w, Node node) {
-		System.out.println(w.getPath());
-		System.out.println(node.getPath());
+		
 	}
 
 	/**
@@ -190,23 +183,21 @@ public class CDIProcessor {
 				m = pa.matcher(field.toString().trim());
 				if (m.matches()) {// Kiem tra su xuat hien cua @inject
 					if (field.getType().toString().equals(parent)) {
-						System.out.println("Declaration");
+						System.out.println("Default Declaration");
 						isAUser = true;
 					}
 				}
 			}
 			// Kiem tra cac method
 			pa = Pattern.compile(USAGE_DEFAULT_CASE_PATTERN);
-			for (MethodDeclaration method : classFileParser
-					.getListMethodDeclaration()) {
-				m = pa.matcher(method.toString().trim().replace("\n", "")
-						.replace("\r", ""));
+			for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
+				m = pa.matcher(method.toString().trim().replace("\n", "") .replace("\r", ""));
 				if (m.matches()) {
-					List<SingleVariableDeclaration> parameters = method
-							.parameters();
+					List<SingleVariableDeclaration> parameters = method .parameters();
 					for (SingleVariableDeclaration p : parameters) {
 						if (p.getType().toString().equals(parent)) {
-							System.out.println("Use");
+							System.out.println(method);
+							System.out.println("Default Use");
 							isAUser = true;
 						}
 					}
