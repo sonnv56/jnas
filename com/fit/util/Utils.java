@@ -13,8 +13,7 @@ public class Utils {
 	/**
 	 * Doc noi dung file java hoac xhtml, xml, jsp
 	 * 
-	 * @param filePath
-	 *            duong dan tuyet doi file
+	 * @param filePath duong dan tuyet doi file
 	 * @return noi dung file
 	 */
 	public static String readFileContent(String filePath) throws IOException {
@@ -31,17 +30,17 @@ public class Utils {
 		reader.close();
 		return fileData.toString();
 	}
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
+
 	public static String getParentOfANode(Node node) {
 		String parentName = "";
 		try {
 			String fileContent = Utils.readFileContent(node.getPath());
 			int template = fileContent.indexOf("class");
-			int index1 = fileContent.indexOf("extends", template) + "extends".length();
-			if(index1 =="extends".length()-1){
-				index1 = fileContent.indexOf("implements", template)+"implements".length();
+			int index1 = fileContent.indexOf("extends", template)
+					+ "extends".length();
+			if (index1 == "extends".length() - 1) {
+				index1 = fileContent.indexOf("implements", template)
+						+ "implements".length();
 			}
 			int index2 = fileContent.indexOf("{", index1);
 			parentName = fileContent.substring(index1, index2).trim();
@@ -52,9 +51,3 @@ public class Utils {
 	}
 
 }
-=======
-}
->>>>>>> 98aeb8eeef2c57ec8d8e628c49c73764dc9b3698
-=======
-}
->>>>>>> 98aeb8eeef2c57ec8d8e628c49c73764dc9b3698
