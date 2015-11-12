@@ -9,7 +9,7 @@ public class JdtParserTest {
 		// String classPath =
 		// "C:\\\\Users\\\\DucAnh\\\\Dropbox\\\\Project\\\\J2EE\\\\DEMO J2EE
 		// 2\\\\dukes-forest\\\\dukes-forest\\\\dukes-payment\\\\src\\\\java\\\\com\\\\forest\\\\payment\\\\services\\\\Payment.java";
-		String classPath = "G:\\Dropbox\\Github\\Java EE\\jnas\\src\\com\\fit\\jdtParser\\ClassFileParser.java";
+		String classPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample//src//java//sample3//cdi//TransportFactory.java";
 		ClassFileParser classFileParser = new ClassFileParser(classPath);
 
 		// display all annotation

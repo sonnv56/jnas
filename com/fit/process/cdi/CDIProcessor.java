@@ -28,13 +28,13 @@ public class CDIProcessor {
 	/** RX cho injection point khai bao mac dinh */
 	private static final String DECLARATION_DEFAULT_CASE_PATTERN = "(@Inject )(?!@).*?(;)";
 	/** RX cho injection point khai bao mac dinh */
-	private static final String USAGE_DEFAULT_CASE_PATTERN = "(@)(Inject ).*?(\\(.*)(?!@).*?(\\)).*";
+	private static final String USAGE_DEFAULT_CASE_PATTERN = "(@(Inject|Produces) ).*?(\\(.*)(?!@).*?(\\)).*";
 	/** Node goc project */
 	private ProjectNode projectNode;
 
 	public static void main(String[] args) {
-		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
-//		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
+//		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
+		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 		CDIProcessor processor = new CDIProcessor();
 		processor.setProjectNode(projectNode);
@@ -87,7 +87,7 @@ public class CDIProcessor {
 	 * */
 	private List<Node> findQualifierCase(String qualifier, List<Node> namedNodes) {
 		String qualifierPattern1 = DECLARATION_DEFAULT_CASE_PATTERN.replace("(?!@)", "(@" + qualifier + " )");
-		String qualifierPattern2 = USAGE_DEFAULT_CASE_PATTERN.replace("(?!@)", "(@" + qualifier + " )");
+		String qualifierPattern2 = USAGE_DEFAULT_CASE_PATTERN;
 		List<Node> nodes = new ArrayList<Node>();
 		for (Node node : namedNodes) {
 			ClassFileParser classFileParser = new ClassFileParser(node.getPath());
@@ -103,13 +103,18 @@ public class CDIProcessor {
 				}
 			}
 			// Kiem tra cac method
-			// Kiem tra cac method
 			pa = Pattern.compile(qualifierPattern2);
 			for (MethodDeclaration method : classFileParser.getListMethodDeclaration()) {
 				m = pa.matcher(method.toString().trim().replace("\n", "").replace("\r", ""));
 				if (m.matches()) {
-					isAUser = true;
-					System.out.println("Qualifier Use");
+					List<SingleVariableDeclaration> parameters = method.parameters();
+					for (SingleVariableDeclaration p : parameters) {
+						if (p.toString().indexOf("@"+qualifier)!=-1) {
+							isAUser = true;
+							System.out.println("Qualifier Use");
+						}
+					}
+					
 				}
 			}
 
@@ -122,7 +127,6 @@ public class CDIProcessor {
 
 	/**
 	 * Lay anotation tu qualifier
-	 * 
 	 * @param qualifiers
 	 * */
 	private List<String> extractAnotationFromQualifiers(List<Node> qualifiers) {
@@ -138,9 +142,10 @@ public class CDIProcessor {
 
 	/**
 	 * Ap dung truong hop mac dinh
+	 * @param namedNodes
+	 * @param defaultNodes
 	 * */
-	private void applyCDIContextWithDefault(List<Node> namedNodes,
-			List<Node> defaultNodes) {
+	private void applyCDIContextWithDefault(List<Node> namedNodes, List<Node> defaultNodes) {
 		if (defaultNodes.size() > 0) {
 			for (Node node : defaultNodes) {
 				String parent = Utils.getParentOfANode(node);
@@ -195,8 +200,7 @@ public class CDIProcessor {
 				if (m.matches()) {
 					List<SingleVariableDeclaration> parameters = method .parameters();
 					for (SingleVariableDeclaration p : parameters) {
-						if (p.getType().toString().equals(parent)) {
-							System.out.println(method);
+						if (p.getType().toString().equals(parent) && p.toString().indexOf("@")==-1) {
 							System.out.println("Default Use");
 							isAUser = true;
 						}
