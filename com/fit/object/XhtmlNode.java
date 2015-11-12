@@ -1,5 +1,5 @@
 package com.fit.object;
 
-public class XhtmlNode extends XMLNode {
+public class XhtmlNode extends XmlNode {
 
 }

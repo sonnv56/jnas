@@ -6,6 +6,6 @@ package com.fit.object;
  * @author DucAnh
  *
  */
-public abstract class XMLNode extends Node {
+public abstract class XmlNode extends Node {
 
 }

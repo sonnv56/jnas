@@ -5,6 +5,6 @@ package com.fit.object;
  * @author DucAnh
  *
  */
-public class ConfigurationNode extends XMLNode {
+public class ConfigurationNode extends XmlNode {
 
 }
