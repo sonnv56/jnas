@@ -12,7 +12,8 @@ import com.fit.jdtParser.ClassFileParser;
  */
 public class JdtParserTest {
 	public static void main(String[] args) {
-		String classPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest\\dukes-payment\\src\\java\\com\\forest\\payment\\services\\Payment.java";
+		String classPath = ConfigurationOfAnh.DUKES_FOREST_PATH
+				+ "\\dukes-payment\\src\\java\\com\\forest\\payment\\services\\Payment.java";
 		ClassFileParser classFileParser = new ClassFileParser(classPath);
 
 		// display all annotation

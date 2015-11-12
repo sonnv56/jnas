@@ -14,8 +14,7 @@ import com.fit.process.jsf.JsfConnectionGeneration;
 public class JsfConnectionGenerationTest {
 	public static void main(String[] args) {
 		// Project tree generation
-		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
-		ProjectNode projectRootNode = ProjectLoader.load(projectRootPath);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
 
 		// create connection between .xhtml/.jsp and managed bean file
 		new JsfConnectionGeneration(projectRootNode);
