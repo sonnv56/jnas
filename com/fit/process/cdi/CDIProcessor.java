@@ -28,13 +28,15 @@ public class CDIProcessor {
 	/** RX cho injection point khai bao mac dinh */
 	private static final String DECLARATION_DEFAULT_CASE_PATTERN = "(@Inject )(?!@).*?(;)";
 	/** RX cho injection point khai bao mac dinh */
-	private static final String USAGE_DEFAULT_CASE_PATTERN = "(@(Inject|Produces) ).*?(\\(.*)(?!@).*?(\\)).*";
+	private static final String USAGE_DEFAULT_CASE_PATTERN = "(@(Inject) ).*?(\\(.*)(?!@).*?(\\)).*";
+	/** RX cho injection point khai bao mac dinh */
+	private static final String PROCEDUCES_DEFAULT_CASE_PATTERN = "(@(Produces) ).*?(\\(.*)(?!@).*?(\\)).*";
 	/** Node goc project */
 	private ProjectNode projectNode;
 
 	public static void main(String[] args) {
-//		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
-		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
+		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
+//		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 		CDIProcessor processor = new CDIProcessor();
 		processor.setProjectNode(projectNode);
@@ -60,7 +62,6 @@ public class CDIProcessor {
 
 	/**
 	 * Xu ly truong hop su dung qualifiers
-	 * 
 	 * @param namedNodes
 	 * @param qulifiersAnotation
 	 * */
@@ -81,7 +82,6 @@ public class CDIProcessor {
 
 	/**
 	 * Xu ly truong hop su dung qualifier
-	 * 
 	 * @param qualifier
 	 * @param namedNodes
 	 * */
@@ -159,7 +159,6 @@ public class CDIProcessor {
 
 	/**
 	 * Tao 1 connection giua cac node
-	 * 
 	 * @param w
 	 * @param node
 	 * */
@@ -169,7 +168,6 @@ public class CDIProcessor {
 
 	/**
 	 * Tim injection point su dung cach mac dinh
-	 * 
 	 * @param anotation
 	 * @param parent
 	 * @param namedNodes
@@ -177,8 +175,7 @@ public class CDIProcessor {
 	private List<Node> findDefaultCase(String parent, List<Node> namedNodes) {
 		List<Node> nodes = new ArrayList<Node>();
 		for (Node node : namedNodes) {
-			ClassFileParser classFileParser = new ClassFileParser(
-					node.getPath());
+			ClassFileParser classFileParser = new ClassFileParser(node.getPath());
 			boolean isAUser = false;
 			// Kiem tra cac field
 			Pattern pa = Pattern.compile(DECLARATION_DEFAULT_CASE_PATTERN);
@@ -207,7 +204,6 @@ public class CDIProcessor {
 					}
 				}
 			}
-
 			if (isAUser) {
 				nodes.add(node);
 			}
@@ -216,6 +212,7 @@ public class CDIProcessor {
 	}
 
 	/**
+	 * Set projectNode value
 	 * @param projectNode
 	 * */
 	public void setProjectNode(ProjectNode projectNode) {
