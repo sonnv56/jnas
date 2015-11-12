@@ -2,11 +2,9 @@ package com.fit.loader;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.fit.config.Configuration;
-import com.fit.loader.tree.ManagedBeanCondition;
-import com.fit.loader.tree.Search;
+import com.fit.ducanh.test.displayTree.TreeStrategy;
 import com.fit.object.ClassNode;
 import com.fit.object.ComponentNode;
 import com.fit.object.JspNode;
@@ -20,13 +18,13 @@ import com.fit.object.XmlNode;
  */
 public class ProjectLoader {
 	public static void main(String[] args) {
-		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Project\\J2EE\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
-		// System.out.println(ProjectLoader.load(projectRootPath).getChildren().get(0).toString());
-		List<Node> listManagedBeanFile = Search.searchNode(ProjectLoader.load(projectRootPath),
-				new ManagedBeanCondition());
-		for (Node item : listManagedBeanFile) {
-			System.out.println(item.getPath());
-		}
+		// Project tree generation
+		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
+		ProjectNode projectRootNode = ProjectLoader.load(projectRootPath);
+
+		// display tree of project
+		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);
+		System.out.println(treeDisplayer.getString());
 	}
 
 	/**
@@ -39,6 +37,7 @@ public class ProjectLoader {
 	public static ProjectNode load(String projectRootPath) {
 		ProjectNode projectNode = new ProjectNode();
 		projectNode.setPath(projectRootPath);
+		projectNode.setId(NUMBER_OF_NODES++);
 		parseSrcFolder(projectNode, projectNode.getPath());
 		return projectNode;
 	}
@@ -51,28 +50,33 @@ public class ProjectLoader {
 			switch (getTypeOfPath(pathItem)) {
 			case Configuration.CLASS_FILE:
 				ClassNode classNode = new ClassNode();
+				classNode.setId(NUMBER_OF_NODES++);
 				classNode.setPath(pathItem);
 				parent.getChildren().add(classNode);
-				
-//				System.out.println(pathItem);
+
+				// System.out.println(pathItem);
 				break;
 			case Configuration.JSP_FILE:
 				JspNode jspFile = new JspNode();
+				jspFile.setId(NUMBER_OF_NODES++);
 				jspFile.setPath(pathItem);
 				parent.getChildren().add(jspFile);
 				break;
 			case Configuration.XHTML_FILE:
 				XhtmlNode xhtmlNode = new XhtmlNode();
+				xhtmlNode.setId(NUMBER_OF_NODES++);
 				xhtmlNode.setPath(pathItem);
 				parent.getChildren().add(xhtmlNode);
 				break;
 			case Configuration.XML_FILE:
 				XmlNode xmlNode = new XmlNode();
+				xmlNode.setId(NUMBER_OF_NODES++);
 				xmlNode.setPath(pathItem);
 				parent.getChildren().add(xmlNode);
 				break;
 			case Configuration.COMPONENT:
 				Node componentNode = new ComponentNode();
+				componentNode.setId(NUMBER_OF_NODES++);
 				componentNode.setPath(pathItem);
 
 				parent.getChildren().add(componentNode);
@@ -132,4 +136,5 @@ public class ProjectLoader {
 	private static final String JSP_SYMBOL = ".jsp";
 	private static final String XML_SYMBOL = ".xml";
 
+	private static int NUMBER_OF_NODES = 0;
 }

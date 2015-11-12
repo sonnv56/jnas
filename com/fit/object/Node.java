@@ -17,6 +17,8 @@ public abstract class Node {
 	private List<Node> children;
 	/** Thanh phan chua thanh phan hien tai */
 	private Node parent;
+	/** ID duy nhat cua thanh phan hien tai*/
+	private int id;
 
 	public Node() {
 		this.callees = new ArrayList<>();
@@ -90,6 +92,21 @@ public abstract class Node {
 	 */
 	public List<Node> getChildren() {
 		return children;
+	}
+
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	/**
