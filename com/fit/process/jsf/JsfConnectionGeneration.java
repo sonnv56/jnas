@@ -1,6 +1,7 @@
 package com.fit.process.jsf;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +29,7 @@ import com.fit.util.Utils;
  */
 public class JsfConnectionGeneration {
 	public static void main(String[] args) {
-		// String projectRootPath =
-		// "C:\\Users\\DucAnh\\Dropbox\\Project\\J2EE\\DEMO J2EE
-		// 2\\dukes-forest\\dukes-forest";
-		String projectRootPath = "G:\\Dropbox\\NetBeansProjects\\dukes-forest";
+		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 
 		JsfConnectionGeneration gen = new JsfConnectionGeneration(projectNode);
@@ -41,21 +39,55 @@ public class JsfConnectionGeneration {
 	}
 
 	public JsfConnectionGeneration(ProjectNode projectNode) {
-		Map<Node, String> managedBeanNodesMap = getManagedBeanNodesMap(projectNode);
-		List<Node> listXHtmlNodes = Search.searchNode(projectNode, new XHtmlCondition());
-		List<Node> listJspNodes = Search.searchNode(projectNode, new JspCondition());
+		List<Node> subProjectList = getSubProject(projectNode);
 
-		listXHtmlNodes.addAll(listJspNodes);
-		createConnectionToManagedFile(listXHtmlNodes, managedBeanNodesMap);
+		for (Node subProjectItem : subProjectList) {
+			Map<Node, String> managedBeanNodesMap = getManagedBeanNodesMap(subProjectItem);
+			List<Node> listXHtmlNodes = Search.searchNode(subProjectItem, new XHtmlCondition());
+			List<Node> listJspNodes = Search.searchNode(subProjectItem, new JspCondition());
+
+			// merge all .xhtml and .jsp files into a single list
+			listXHtmlNodes.addAll(listJspNodes);
+			
+			createConnectionToManagedFile(listXHtmlNodes, managedBeanNodesMap);
+		}
 	}
 
 	/**
+	 * Kiem tra project dau vao co chua project con
+	 * 
+	 * @param projectNode
+	 * @return true neu trong project dau vao co nhieu project con<br/>
+	 *         false project dau vao chinh la project con
+	 */
+	private boolean containManyProjects(ProjectNode projectNode) {
+		// do something here
+		return true;// assume
+	}
+
+	/**
+	 * Lay danh sach project con trong project dau vao
 	 * 
 	 * @param projectNode
 	 * @return
 	 */
-	private Map<Node, String> getManagedBeanNodesMap(ProjectNode projectNode) {
-		List<Node> listManagedBeanNodes = Search.searchNode(projectNode, new ManagedBeanCondition());
+	private List<Node> getSubProject(ProjectNode projectNode) {
+		List<Node> projectList = new ArrayList<Node>();
+		if (containManyProjects(projectNode))
+			projectList = projectNode.getChildren();
+		else
+			projectList.add(projectNode);
+		return projectList;
+	}
+
+	/**
+	 * 
+	 * @param subProjectNode
+	 *            project con trong project dau vao
+	 * @return
+	 */
+	private Map<Node, String> getManagedBeanNodesMap(Node subProjectNode) {
+		List<Node> listManagedBeanNodes = Search.searchNode(subProjectNode, new ManagedBeanCondition());
 		Map<Node, String> managedBeanNodesMap = new HashMap<>();
 		for (Node managedBean : listManagedBeanNodes) {
 			managedBeanNodesMap.put(managedBean, getManagedName(managedBean));

@@ -13,7 +13,8 @@ public class Utils {
 	/**
 	 * Doc noi dung file java hoac xhtml, xml, jsp
 	 * 
-	 * @param filePath duong dan tuyet doi file
+	 * @param filePath
+	 *            duong dan tuyet doi file
 	 * @return noi dung file
 	 */
 	public static String readFileContent(String filePath) throws IOException {
@@ -36,11 +37,9 @@ public class Utils {
 		try {
 			String fileContent = Utils.readFileContent(node.getPath());
 			int template = fileContent.indexOf("class");
-			int index1 = fileContent.indexOf("extends", template)
-					+ "extends".length();
+			int index1 = fileContent.indexOf("extends", template) + "extends".length();
 			if (index1 == "extends".length() - 1) {
-				index1 = fileContent.indexOf("implements", template)
-						+ "implements".length();
+				index1 = fileContent.indexOf("implements", template) + "implements".length();
 			}
 			int index2 = fileContent.indexOf("{", index1);
 			parentName = fileContent.substring(index1, index2).trim();
@@ -50,4 +49,18 @@ public class Utils {
 		return parentName;
 	}
 
+	/**
+	 * Xoa tat ca moi comment trong file Java
+	 * 
+	 * @param fileContent
+	 *            noi dung file Java
+	 * @return
+	 */
+	public static String removeAllComments(String fileContent) {
+		final String REPLACEMENT = "";
+		final String COMMENT_REGEX = "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)";
+
+		fileContent = fileContent.replaceAll(COMMENT_REGEX, REPLACEMENT);
+		return fileContent;
+	}
 }
