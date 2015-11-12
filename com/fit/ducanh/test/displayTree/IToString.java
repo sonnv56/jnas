@@ -1,7 +1,7 @@
 package com.fit.ducanh.test.displayTree;
 
 /**
- * Convert a object to a String
+ * Interface chuyen doi mot cay sang bieu dien dang xau
  * 
  * @author DucAnh
  *

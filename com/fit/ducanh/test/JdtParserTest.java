@@ -4,6 +4,12 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 import com.fit.jdtParser.ClassFileParser;
 
+/**
+ * Test JdtParser
+ * 
+ * @author DucAnh
+ *
+ */
 public class JdtParserTest {
 	public static void main(String[] args) {
 		String classPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest\\dukes-payment\\src\\java\\com\\forest\\payment\\services\\Payment.java";
