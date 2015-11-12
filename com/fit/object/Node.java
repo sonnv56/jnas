@@ -17,7 +17,7 @@ public abstract class Node {
 	private List<Node> children;
 	/** Thanh phan chua thanh phan hien tai */
 	private Node parent;
-	/** ID duy nhat cua thanh phan hien tai*/
+	/** ID duy nhat cua thanh phan hien tai */
 	private int id;
 
 	public Node() {
@@ -85,6 +85,13 @@ public abstract class Node {
 	 */
 	public void setParent(Node parent) {
 		this.parent = parent;
+	}
+
+	/**
+	 * @return the callers
+	 */
+	public Node getParent() {
+		return parent;
 	}
 
 	/**

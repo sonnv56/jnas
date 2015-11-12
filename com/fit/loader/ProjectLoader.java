@@ -53,26 +53,28 @@ public class ProjectLoader {
 				classNode.setId(NUMBER_OF_NODES++);
 				classNode.setPath(pathItem);
 				parent.getChildren().add(classNode);
-
-				// System.out.println(pathItem);
+				classNode.setParent(parent);
 				break;
 			case Configuration.JSP_FILE:
 				JspNode jspFile = new JspNode();
 				jspFile.setId(NUMBER_OF_NODES++);
 				jspFile.setPath(pathItem);
 				parent.getChildren().add(jspFile);
+				jspFile.setParent(parent);
 				break;
 			case Configuration.XHTML_FILE:
 				XhtmlNode xhtmlNode = new XhtmlNode();
 				xhtmlNode.setId(NUMBER_OF_NODES++);
 				xhtmlNode.setPath(pathItem);
 				parent.getChildren().add(xhtmlNode);
+				xhtmlNode.setParent(parent);
 				break;
 			case Configuration.XML_FILE:
 				ConfigurationNode xmlNode = new ConfigurationNode();
 				xmlNode.setId(NUMBER_OF_NODES++);
 				xmlNode.setPath(pathItem);
 				parent.getChildren().add(xmlNode);
+				xmlNode.setParent(parent);
 				break;
 			case Configuration.COMPONENT:
 				Node componentNode = new ComponentNode();
@@ -124,8 +126,6 @@ public class ProjectLoader {
 
 		for (String name : names) {
 			pathOfChildren.add(path + "\\" + name);
-
-			// System.out.println(path + "\\" + name);
 		}
 
 		return pathOfChildren;
