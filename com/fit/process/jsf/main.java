@@ -29,6 +29,8 @@ public class main {
 				managedBeanNodeList.addAll(ManageBeanParser.collectManageBean(configItem));
 				managedBeanNodeList.addAll(CollectManagedBeanFromJavaFile.getManagedBeansList(subProjectItem));
 				
+				// 
+				ConnectionGeneration.createConnection(subProjectItem, dependenciesList);
 			}
 		}
 	}

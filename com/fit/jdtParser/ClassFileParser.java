@@ -3,6 +3,7 @@ package com.fit.jdtParser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -11,6 +12,7 @@ import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
@@ -30,6 +32,7 @@ import com.fit.util.Utils;
 public class ClassFileParser extends Object implements IJdtParser {
 
 	private List<MethodDeclaration> listMethodDeclaration = new ArrayList<MethodDeclaration>();
+	private List<ImportDeclaration> listImportDeclaration = new ArrayList<ImportDeclaration>();
 	private List<FieldDeclaration> listFieldDeclaration = new ArrayList<FieldDeclaration>();
 	private List<ASTNode> listAnnotation = new ArrayList<ASTNode>();
 	private Type extendClass;
@@ -62,6 +65,12 @@ public class ClassFileParser extends Object implements IJdtParser {
 		final CompilationUnit cu = (CompilationUnit) parser.createAST(null);
 
 		cu.accept(new ASTVisitor() {
+			// visit a method
+			public boolean visit(ImportDeclaration node) {
+				listImportDeclaration.add(node);
+				return true;
+			}
+
 			// visit a method
 			public boolean visit(MethodDeclaration node) {
 				listMethodDeclaration.add(node);
@@ -122,7 +131,12 @@ public class ClassFileParser extends Object implements IJdtParser {
 	public List<TypeDeclaration> getInterfaces() {
 		return interfaces;
 	}
+
 	public Type getExtendClass() {
 		return extendClass;
+	}
+
+	public List<ImportDeclaration> getListImportDeclaration() {
+		return listImportDeclaration;
 	}
 }
