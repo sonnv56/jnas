@@ -11,7 +11,7 @@ import com.fit.object.JspNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.object.XhtmlNode;
-import com.fit.object.XmlNode;
+import com.fit.object.ConfigurationNode;
 
 /**
  * Load 1 project
@@ -69,7 +69,7 @@ public class ProjectLoader {
 				parent.getChildren().add(xhtmlNode);
 				break;
 			case Configuration.XML_FILE:
-				XmlNode xmlNode = new XmlNode();
+				ConfigurationNode xmlNode = new ConfigurationNode();
 				xmlNode.setId(NUMBER_OF_NODES++);
 				xmlNode.setPath(pathItem);
 				parent.getChildren().add(xmlNode);

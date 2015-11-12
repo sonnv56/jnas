@@ -5,7 +5,7 @@ import com.fit.object.ComponentNode;
 import com.fit.object.JspNode;
 import com.fit.object.Node;
 import com.fit.object.XhtmlNode;
-import com.fit.object.XmlNode;
+import com.fit.object.ConfigurationNode;
 
 /**
  * Mot chien thuat bien doi cay sang xau
@@ -54,7 +54,7 @@ public class TreeStrategy implements IToString {
 				for (Node callee : n.getCallees())
 					output += genTab(level + 1) + "[callee id=" + callee.getId() + "]" + callee.getNodeName() + "\n";
 
-			} else if (n instanceof XmlNode) {
+			} else if (n instanceof ConfigurationNode) {
 				output += genTab(level) + "[" + n.getId() + "]" + n.getNodeName() + "\n";
 			}
 		}
