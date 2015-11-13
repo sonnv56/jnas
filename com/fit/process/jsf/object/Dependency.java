@@ -1,4 +1,4 @@
-package com.fit.process.jsf;
+package com.fit.process.jsf.object;
 
 import com.fit.object.Node;
 

@@ -3,6 +3,8 @@ package com.fit.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fit.object.Node;
 
@@ -29,7 +31,7 @@ public class Utils {
 			buf = new char[1024];
 		}
 		reader.close();
-		return fileData.toString();
+		return Utils.removeAllComments(fileData.toString());
 	}
 
 	public static String getParentOfANode(Node node) {
@@ -62,5 +64,36 @@ public class Utils {
 
 		fileContent = fileContent.replaceAll(COMMENT_REGEX, REPLACEMENT);
 		return fileContent;
+	}
+
+	/**
+	 * Kiem tra mot project co chua cac project nho hon hay khong
+	 * 
+	 * @param projectNode
+	 * @return true neu project chua cac project con<br/>
+	 *         false neu la project con
+	 */
+	public static boolean containManyProject(Node projectNode) {
+		final String BUILD_FOLDER_NAME = "build";
+		for (Node child : projectNode.getChildren()) {
+			if (child.getNodeName().equals(BUILD_FOLDER_NAME))
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Lay danh sach cac project con tu project dau vao
+	 * 
+	 * @param projectRootNode
+	 */
+	public static List<Node> getSubProjectsList(Node projectRootNode) {
+		List<Node> projects = new ArrayList<Node>();
+		if (Utils.containManyProject(projectRootNode))
+			for (Node subProjectItem : projectRootNode.getChildren())
+				projects.add(subProjectItem);
+		else
+			projects.add(projectRootNode);
+		return projects;
 	}
 }

@@ -1,9 +1,10 @@
-package com.fit.process.jsf;
+package com.fit.process.jsf.connection;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fit.object.Node;
+import com.fit.process.jsf.object.Dependency;
 
 /**
  * Phan tich cac navigation rule trong mot file config cua JSF
@@ -11,7 +12,7 @@ import com.fit.object.Node;
  * @author DucAnh
  *
  */
-public class NavigationParser {
+public class WebPageToWebPage {
 	/**
 	 * 
 	 * @param configPath
