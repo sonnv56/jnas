@@ -27,4 +27,8 @@ public class Dependency {
 	public void setGayPhuThuoc(Node gayPhuThuoc) {
 		this.gayPhuThuoc = gayPhuThuoc;
 	}
+
+	public String toString() {
+		return gayPhuThuoc.getPath() + "->" + biPhuThuoc.getPath();
+	}
 }

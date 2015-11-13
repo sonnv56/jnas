@@ -1,4 +1,4 @@
-package com.fit.process.jsf.connection;
+package com.fit.process.jsf.dependenciesgeneration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,36 +14,42 @@ import org.w3c.dom.NodeList;
 import com.fit.ducanh.test.ConfigurationOfAnh;
 import com.fit.loader.ProjectLoader;
 import com.fit.loader.tree.Search;
+import com.fit.object.ConfigurationNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.process.jsf.condition.ConfigurationCondition;
+import com.fit.process.jsf.object.Dependency;
 
 /**
- * Phan tich web.xml trong mot project con lay danh sach file cau hinh <br/>
+ * 
  * Input: Mot project con <br/>
- * Output: Danh sach cac Node tuong ung voi cac file JSF config trong project
- * dau vao
+ * Output: Danh sach su phu thuoc (web.xml, JSFConfigfiles), danh sach JSFConfig
+ * files
  * 
  * @author DucAnh
  *
  */
-public class JSFConfigToWebConfig extends ConnectionGeneration {
+public class WebConfigParser extends DependenciesGeneration {
 	private List<Node> listConfigJSFNode = new ArrayList<>();
+	private Node webConfig = new ConfigurationNode();
 
 	public static void main(String[] args) {
 		// Project tree generation
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.MULTIPLE_CONFIG_JSF1);
 
-		List<Node> listConfigJSFNode = new JSFConfigToWebConfig(projectRootNode).getListConfigJSFNode();
-		for (Node n : listConfigJSFNode) {
-			System.out.println(n.getPath());
+		WebConfigParser parser = new WebConfigParser(projectRootNode);
+
+		System.out.println("web.xml path: " + parser.getWebConfig().getPath());
+
+		System.out.println("JSF configs:");
+		for (Node n : parser.getListConfigJSFNode()) {
+			System.out.println("\t" + n.getPath());
 		}
-	}
 
-	@Override
-	void findDependencies() {
-		// TODO Auto-generated method stub
-
+		System.out.println("Dependencies List:");
+		for (Dependency n : parser.getDependenciesList()) {
+			System.out.println(n.toString());
+		}
 	}
 
 	/**
@@ -51,16 +57,33 @@ public class JSFConfigToWebConfig extends ConnectionGeneration {
 	 * @param projectNode
 	 *            project con
 	 */
-	public JSFConfigToWebConfig(Node projectNode) {
+	public WebConfigParser(Node projectNode) {
+		webConfig = findWebConfig(projectNode);
+		listConfigJSFNode = findListConfigJSFNode(projectNode, webConfig);
+		dependenciesList = findDependencies();
+	}
+
+	private Node findWebConfig(Node projectNode) {
 		// Tim kiem Node web.xml
 		List<Node> webConfig = Search.searchNode(projectNode, new ConfigurationCondition(),
 				projectNode.getNodeName() + "\\web\\WEB-INF\\web.xml");
 		if (webConfig == null || webConfig.size() == 0)
-			return;
+			return null;
 		Node selectedWebConfig = webConfig.get(0);
+		return selectedWebConfig;
+	}
+
+	/**
+	 * Danh sach Node tuong ung voi JSFConfig
+	 * 
+	 * @param projectNode
+	 * @return
+	 */
+	private List<Node> findListConfigJSFNode(Node projectNode, Node nWebConfig) {
+		List<Node> listConfigJSFNode = new ArrayList<>();
 
 		// Lay duong dan tuyet doi cac file config trong web.xml
-		String[] configsFile = parseConfigFile(selectedWebConfig);
+		String[] configsFile = parseConfigFile(nWebConfig);
 		if (configsFile != null)
 			for (String config : configsFile) {
 
@@ -76,6 +99,8 @@ public class JSFConfigToWebConfig extends ConnectionGeneration {
 					listConfigJSFNode.add(configPath);
 				}
 			}
+
+		return listConfigJSFNode;
 	}
 
 	/**
@@ -118,6 +143,22 @@ public class JSFConfigToWebConfig extends ConnectionGeneration {
 
 	public List<Node> getListConfigJSFNode() {
 		return listConfigJSFNode;
+	}
+
+	@Override
+	public List<Dependency> findDependencies() {
+		List<Dependency> dependenciesList = new ArrayList<>();
+		for (Node JSFConfig : listConfigJSFNode) {
+			Dependency d = new Dependency();
+			d.setBiPhuThuoc(JSFConfig);
+			d.setGayPhuThuoc(webConfig);
+			dependenciesList.add(d);
+		}
+		return dependenciesList;
+	}
+
+	public Node getWebConfig() {
+		return webConfig;
 	}
 
 	private static final String CONFIG_FILES_TAG = "javax.faces.CONFIG_FILES";
