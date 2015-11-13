@@ -35,7 +35,11 @@ public class CDICustomQualifierCondition extends Condition {
 				// Doc file java
 				String fileContent = Utils.readFileContent(n.getPath());
 				// Lay vi tri cua anotation Named
-				int index = fileContent.indexOf(ANOTATION_PREFIX+name);
+				String anotation = name;
+				if(anotation.indexOf(ANOTATION_PREFIX) == -1){
+					anotation = ANOTATION_PREFIX + name;
+				}
+				int index = fileContent.indexOf(anotation);
 				int index2 = fileContent.indexOf(INJECT_ANOTATION);
 				int index3 = fileContent.indexOf(DECLARE_CLASS, index);
 				// Kiem tra
