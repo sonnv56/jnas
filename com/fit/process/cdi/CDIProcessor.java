@@ -30,13 +30,13 @@ public class CDIProcessor {
 	/** RX cho injection point khai bao mac dinh */
 	private static final String USAGE_DEFAULT_CASE_PATTERN = "(@(Inject) ).*?(\\(.*)(?!@).*?(\\)).*";
 	/** RX cho injection point khai bao mac dinh */
-	private static final String PROCEDUCES_DEFAULT_CASE_PATTERN = "(@(Produces) ).*?(\\(.*)(?!@).*?(\\)).*";
+	private static final String PROCEDUCES_DEFAULT_CASE_PATTERN = "(@)(Produces)( ).*?(\\().*?(\\)).*";
 	/** Node goc project */
 	private ProjectNode projectNode;
 
 	public static void main(String[] args) {
-		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
-//		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
+//		String projectRootPath = "C://Users//son//Google Drive//Share//CIASample";
+		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 		CDIProcessor processor = new CDIProcessor();
 		processor.setProjectNode(projectNode);
@@ -50,14 +50,26 @@ public class CDIProcessor {
 	 * */
 	public void process() {
 		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
-		List<Node> qualifiers = Search.searchNode(projectNode, new CDIQualifierCondition());
-		List<Node> defaultNodes = Search.searchNode(projectNode, new CDIDefaultCondition());
-		// Xu ly cach quy dinh 1
-		applyCDIContextWithDefault(namedNodes, defaultNodes);
-		// Xy ly cach quy dinh 2
-		List<String> qulifiersAnotation = extractAnotationFromQualifiers(qualifiers);
-		applyCDIContextWithQualifiers(namedNodes, qulifiersAnotation);
+		if(namedNodes.size() > 0){
+			List<Node> qualifiers = Search.searchNode(projectNode, new CDIQualifierCondition());
+			List<Node> defaultNodes = Search.searchNode(projectNode, new CDIDefaultCondition());
+			
+			if(defaultNodes.size() > 0){
+				// Xu ly cach quy dinh 1 @Inject @Alternative @Default
+				applyCDIContextWithDefault(namedNodes, defaultNodes);
+			}
+			List<String> qulifiersAnotation = extractAnotationFromQualifiers(qualifiers);
+			if(qualifiers.size() > 0){
+				// Xy ly cach quy dinh 2 @Qualifier
+				applyCDIContextWithQualifiers(namedNodes, qulifiersAnotation);
+				// Xy ly cach quy dinh 3
+				applyCDIContextWithProceduce(namedNodes, qulifiersAnotation);
+			}
+		}
+	}
 
+	private void applyCDIContextWithProceduce(List<Node> namedNodes, List<String> qulifiersAnotation) {
+		
 	}
 
 	/**
@@ -65,15 +77,14 @@ public class CDIProcessor {
 	 * @param namedNodes
 	 * @param qulifiersAnotation
 	 * */
-	private void applyCDIContextWithQualifiers(List<Node> namedNodes,
-			List<String> qulifiersAnotation) {
+	private void applyCDIContextWithQualifiers(List<Node> namedNodes, List<String> qulifiersAnotation) {
 		for (String qualifier : qulifiersAnotation) {
 			// Xac dinh candidate
 			List<Node> qualifiers = Search.searchNode(projectNode,new CDICustomQualifierCondition(qualifier));
 			for (Node node : qualifiers) {
 				// Xac dinh injection point
-				List<Node> whoUseParent = findQualifierCase(qualifier,namedNodes);
-				for (Node node2 : whoUseParent){
+				List<Node> injectionPoints = findQualifierCase(qualifier,namedNodes);
+				for (Node node2 : injectionPoints){
 					createAConnectInProjectTree(node, node2);
 				}
 			}
@@ -180,8 +191,7 @@ public class CDIProcessor {
 			// Kiem tra cac field
 			Pattern pa = Pattern.compile(DECLARATION_DEFAULT_CASE_PATTERN);
 			Matcher m = null;
-			for (FieldDeclaration field : classFileParser
-					.getListFieldDeclaration()) {
+			for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
 				m = pa.matcher(field.toString().trim());
 				if (m.matches()) {// Kiem tra su xuat hien cua @inject
 					if (field.getType().toString().equals(parent)) {

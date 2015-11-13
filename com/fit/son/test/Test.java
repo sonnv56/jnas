@@ -3,12 +3,12 @@ package com.fit.son.test;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-
-import com.fit.jdtParser.ClassFileParser;
-
 public class Test {
 	public static void main(String[] args) {
-		String parrten = "(@(Produces) ).*?(\\(.*)(?!@).*?(\\)).*";
+		String parrtern = "(@)(Produces)( ).*?(\\().*?(\\)).*";
+		Pattern pa = Pattern.compile(parrtern);
+		String text = "@Inject ATMTransport createTransport(@Soap ATMTransport soapTransport, @Json ATMTransport jsonTransport)";
+		Matcher m = pa.matcher(text);
+		System.out.println(m.matches());
 	}
 }
