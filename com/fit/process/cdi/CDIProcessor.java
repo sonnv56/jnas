@@ -63,13 +63,25 @@ public class CDIProcessor {
 				// Xy ly cach quy dinh 2 @Qualifier
 				applyCDIContextWithQualifiers(namedNodes, qulifiersAnotation);
 				// Xy ly cach quy dinh 3
-				applyCDIContextWithProceduce(namedNodes, qulifiersAnotation);
+				applyCDIContextWithProduces(namedNodes, qulifiersAnotation);
 			}
 		}
 	}
-
-	private void applyCDIContextWithProceduce(List<Node> namedNodes, List<String> qulifiersAnotation) {
-		
+	/**
+	 * Xu li cac truong hop dung @Produces
+	 * */
+	private void applyCDIContextWithProduces(List<Node> namedNodes, List<String> qulifiersAnotation) {
+		for (String qualifier : qulifiersAnotation) {
+			// Xac dinh candidate
+			List<Node> qualifiers = Search.searchNode(projectNode,new CDICustomQualifierCondition(qualifier));
+			for (Node node : qualifiers) {
+				// Xac dinh injection point
+				List<Node> injectionPoints = findQualifierCase(qualifier,namedNodes);
+				for (Node node2 : injectionPoints){
+					createAConnectInProjectTree(node, node2);
+				}
+			}
+		}
 	}
 
 	/**
