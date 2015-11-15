@@ -31,7 +31,26 @@ public class Utils {
 			buf = new char[1024];
 		}
 		reader.close();
-		return Utils.removeAllComments(fileData.toString());
+		
+		// delete comments
+		if (filePath.endsWith(".java"))
+			return Utils.removeAllCommentsInJavaFile(fileData.toString());
+		else if (filePath.endsWith(".xml") || filePath.endsWith(".xhtml") || filePath.endsWith(".jsp"))
+			return Utils.removeAllCommentsInXmlFile(fileData.toString());
+		else
+			return fileData.toString();
+	}
+
+	/**
+	 * Xoa tat ca moi comment trong file .xml
+	 * 
+	 * @param fileContent
+	 *            noi dung file .xml
+	 * @return
+	 */
+	private static String removeAllCommentsInXmlFile(String fileContent) {
+		// do something here
+		return fileContent;
 	}
 
 	public static String getParentOfANode(Node node) {
@@ -58,7 +77,7 @@ public class Utils {
 	 *            noi dung file Java
 	 * @return
 	 */
-	public static String removeAllComments(String fileContent) {
+	public static String removeAllCommentsInJavaFile(String fileContent) {
 		final String REPLACEMENT = "";
 		final String COMMENT_REGEX = "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)";
 

@@ -1,5 +1,5 @@
 package com.fit.process.jsf;
 
-public interface IParser {
+public interface IProjectParser {
 	void parse();
 }

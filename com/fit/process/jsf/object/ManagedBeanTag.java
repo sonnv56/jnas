@@ -1,12 +1,20 @@
 package com.fit.process.jsf.object;
 
+import org.w3c.dom.Element;
+
 import com.fit.object.Node;
 
-public class NavigationRule {
+/**
+ * Dai dien mot the mangaged-bean trong JSF config
+ * 
+ * @author DucAnh
+ *
+ */
+public class ManagedBeanTag {
+	Element content;
 	Node JSFConfig;
-	String content;
 
-	public String getContent() {
+	public Element getContent() {
 		return content;
 	}
 
@@ -14,7 +22,7 @@ public class NavigationRule {
 		return JSFConfig;
 	}
 
-	public void setContent(String content) {
+	public void setContent(Element content) {
 		this.content = content;
 	}
 

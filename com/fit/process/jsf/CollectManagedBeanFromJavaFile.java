@@ -15,7 +15,7 @@ import com.fit.loader.tree.Search;
 import com.fit.object.ClassNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
-import com.fit.process.jsf.object.ManagedBeanNode;
+import com.fit.process.jsf.object.ManagedBeanNodeContainer;
 
 /**
  * Lay danh sach ten cac managed bean trong project duoc dinh nghia trong cac
@@ -25,14 +25,15 @@ import com.fit.process.jsf.object.ManagedBeanNode;
  *
  */
 public class CollectManagedBeanFromJavaFile {
-	private List<ManagedBeanNode> listManagedBeanNodes = new ArrayList<ManagedBeanNode>();
+	private List<ManagedBeanNodeContainer> listManagedBeanNodes = new ArrayList<ManagedBeanNodeContainer>();
 
 	public static void main(String[] args) {
 		// Project tree generation
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
 
-		List<ManagedBeanNode> output = new CollectManagedBeanFromJavaFile(projectRootNode).getListManagedBeanNodes();
-		for (ManagedBeanNode n : output) {
+		List<ManagedBeanNodeContainer> output = new CollectManagedBeanFromJavaFile(projectRootNode)
+				.getListManagedBeanNodes();
+		for (ManagedBeanNodeContainer n : output) {
 			System.out.println(n.getClassNode().getPath());
 		}
 	}
@@ -41,16 +42,16 @@ public class CollectManagedBeanFromJavaFile {
 		listManagedBeanNodes = getManagedBeansList(projectNode);
 	}
 
-	public List<ManagedBeanNode> getListManagedBeanNodes() {
+	public List<ManagedBeanNodeContainer> getListManagedBeanNodes() {
 		return listManagedBeanNodes;
 	}
 
-	private List<ManagedBeanNode> getManagedBeansList(Node projectNode) {
-		List<ManagedBeanNode> listManagedBeanNodes = new ArrayList<ManagedBeanNode>();
+	private List<ManagedBeanNodeContainer> getManagedBeansList(Node projectNode) {
+		List<ManagedBeanNodeContainer> listManagedBeanNodes = new ArrayList<ManagedBeanNodeContainer>();
 
 		List<Node> listNode = Search.searchNode(projectNode, new ManagedBeanCondition());
 		for (Node n : listNode) {
-			ManagedBeanNode managedBean = new ManagedBeanNode((ClassNode) n);
+			ManagedBeanNodeContainer managedBean = new ManagedBeanNodeContainer((ClassNode) n);
 			String name = getManagedName(n);
 			managedBean.setName(name);
 			listManagedBeanNodes.add(managedBean);
@@ -75,7 +76,7 @@ public class CollectManagedBeanFromJavaFile {
 				managedName = parseManageBeanAnnotation(managedBeanAnnotation);
 				// managed bean file khong duoc dinh nghia ten
 				if (managedName.length() == 0) {
-					managedName = managedNode.getNodeName();
+					managedName = managedNode.getNodeName().replace(".java", "");
 				}
 				break;
 			}

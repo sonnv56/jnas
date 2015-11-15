@@ -19,6 +19,7 @@ import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.process.jsf.condition.ConfigurationCondition;
 import com.fit.process.jsf.object.Dependency;
+import com.fit.util.Utils;
 
 /**
  * 
@@ -117,7 +118,7 @@ public class WebConfigParser extends DependenciesGeneration {
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(inputFile);
 			doc.getDocumentElement().normalize();
-
+			
 			// our code
 			NodeList nList = doc.getElementsByTagName(CONTEXT_TAG);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
