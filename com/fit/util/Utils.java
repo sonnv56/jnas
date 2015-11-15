@@ -31,7 +31,7 @@ public class Utils {
 			buf = new char[1024];
 		}
 		reader.close();
-		
+
 		// delete comments
 		if (filePath.endsWith(".java"))
 			return Utils.removeAllCommentsInJavaFile(fileData.toString());
@@ -79,9 +79,10 @@ public class Utils {
 	 */
 	public static String removeAllCommentsInJavaFile(String fileContent) {
 		final String REPLACEMENT = "";
-		final String COMMENT_REGEX = "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)";
+		final String[] COMMENT_REGEX = new String[] { "/\\*.*\\*/", "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)" };
 
-		fileContent = fileContent.replaceAll(COMMENT_REGEX, REPLACEMENT);
+		for (String regex : COMMENT_REGEX)
+			fileContent = fileContent.replaceAll(regex, REPLACEMENT);
 		return fileContent;
 	}
 

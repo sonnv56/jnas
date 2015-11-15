@@ -12,7 +12,13 @@ import com.fit.process.jsf.object.Dependency;
  *
  */
 public class TreeUpdater {
-	public static void createConnection(Node projectNode, List<Dependency> dependenciesList) {
+	public static void createConnection(List<Dependency> dependenciesList) {
+		for (Dependency d : dependenciesList) {
+			Node nBiPhuThuoc = d.getBiPhuThuoc();
+			Node nGayPhuThuoc = d.getGayPhuThuoc();
 
+			nBiPhuThuoc.getCallers().add(nGayPhuThuoc);
+			nGayPhuThuoc.getCallees().add(nBiPhuThuoc);
+		}
 	}
 }
