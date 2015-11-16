@@ -6,7 +6,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fit.ducanh.test.ConfigurationOfAnh;
+import com.fit.loader.ProjectLoader;
+import com.fit.loader.tree.ClassCondition;
+import com.fit.loader.tree.Search;
+import com.fit.object.ClassNode;
 import com.fit.object.Node;
+import com.fit.object.ProjectNode;
 
 /**
  * Bo thu vien cac tinh nang
@@ -31,26 +37,7 @@ public class Utils {
 			buf = new char[1024];
 		}
 		reader.close();
-
-		// delete comments
-		if (filePath.endsWith(".java"))
-			return Utils.removeAllCommentsInJavaFile(fileData.toString());
-		else if (filePath.endsWith(".xml") || filePath.endsWith(".xhtml") || filePath.endsWith(".jsp"))
-			return Utils.removeAllCommentsInXmlFile(fileData.toString());
-		else
-			return fileData.toString();
-	}
-
-	/**
-	 * Xoa tat ca moi comment trong file .xml
-	 * 
-	 * @param fileContent
-	 *            noi dung file .xml
-	 * @return
-	 */
-	private static String removeAllCommentsInXmlFile(String fileContent) {
-		// do something here
-		return fileContent;
+		return fileData.toString();
 	}
 
 	public static String getParentOfANode(Node node) {
@@ -68,22 +55,6 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return parentName;
-	}
-
-	/**
-	 * Xoa tat ca moi comment trong file Java
-	 * 
-	 * @param fileContent
-	 *            noi dung file Java
-	 * @return
-	 */
-	public static String removeAllCommentsInJavaFile(String fileContent) {
-		final String REPLACEMENT = "";
-		final String[] COMMENT_REGEX = new String[] { "/\\*.*\\*/", "(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/)|(?://.*)" };
-
-		for (String regex : COMMENT_REGEX)
-			fileContent = fileContent.replaceAll(regex, REPLACEMENT);
-		return fileContent;
 	}
 
 	/**
@@ -115,5 +86,23 @@ public class Utils {
 		else
 			projects.add(projectRootNode);
 		return projects;
+	}
+
+	/***/
+	public static Node findNodeByPath(Node projectNode, Node node) {
+		for (Node child : Search.searchNode(projectNode, new ClassCondition())) {
+			if (node.getPath().equals(child.getPath())) {
+				return child;
+			}
+		}
+		return null;
+	}
+
+	public static void main(String[] args) {
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
+		String test = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest\\dukes-shipment\\src\\java\\com\\forest\\entity\\Person.java";
+		Node node = new ClassNode();
+		node.setPath(test);
+		System.out.println(findNodeByPath(projectRootNode, node));
 	}
 }

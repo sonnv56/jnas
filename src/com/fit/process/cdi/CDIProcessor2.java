@@ -18,6 +18,7 @@ import com.fit.process.cdi.condition.CDICustomQualifierCondition;
 import com.fit.process.cdi.condition.CDINamedCondition;
 import com.fit.process.cdi.condition.CDIObservesCondition;
 import com.fit.process.cdi.condition.CDIProducesCondition;
+import com.fit.util.Utils;
 
 public class CDIProcessor2 {
 	private static final String INJEXTION_ANOTATION = "@Inject";
@@ -41,18 +42,17 @@ public class CDIProcessor2 {
 		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
 		List<InjectionPoint> points = findInjectionPointsInInjector(namedNodes);
 		points = updateInjectionPointsWithInjectee(points);
-		updateProjectNode();
-		for (InjectionPoint point : points) {
-//			
-//			System.out.println(point.getStatement());
-//			
-			System.out.println(point.getInjectee().getPath());
-//			System.out.println("-------");
-		}
+		updateProjectNode(points);
 	}
-	private void updateProjectNode() {
-		
-		
+	private void updateProjectNode(List<InjectionPoint> points) {
+	
+		for (InjectionPoint injectionPoint : points) {
+			Node caller = Utils.findNodeByPath(projectNode, injectionPoint.getInjector());
+			Node callee = Utils.findNodeByPath(projectNode, injectionPoint.getInjectee());
+
+			caller.getCallees().add(callee);
+			callee.getCallers().add(caller);
+		}		
 	}
 	private List<InjectionPoint> updateInjectionPointsWithInjectee(List<InjectionPoint> points) {
 		List<InjectionPoint> result = new ArrayList<InjectionPoint>();

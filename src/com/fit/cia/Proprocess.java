@@ -19,7 +19,7 @@ import com.fit.process.DependencyGeneration;
 public class Proprocess {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH2);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
 
 		// create dependency between nodes in structure tree here (do later)
 		DependencyGeneration.parse(projectRootNode);
