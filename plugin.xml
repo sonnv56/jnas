@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="net.sourceforge.earticleast.app.objectContribution1"
+            objectClass="org.eclipse.jdt.core.ICompilationUnit">
+         <action
+               class="net.sourceforge.earticleast.app.ASTArticleActionDelegate"
+               id="net.sourceforge.earticleast.app.astArticleAction1"
+               label="AST Article: Move Declaration"/>
+      </objectContribution>
+   </extension>
+
+</plugin>
