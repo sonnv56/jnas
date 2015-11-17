@@ -64,7 +64,6 @@ public class CDIProcessor2 {
 			if(callee !=null && caller !=null){
 				caller.getCallees().add(callee);
 				callee.getCallers().add(caller);
-				System.out.println(callee.getPath());
 			}
 		}		
 	}

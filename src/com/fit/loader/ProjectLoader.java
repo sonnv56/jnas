@@ -11,7 +11,6 @@ import com.fit.object.JspNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.object.XhtmlNode;
-import com.fit.util.Utils;
 import com.fit.object.ConfigurationNode;
 
 /**
@@ -20,7 +19,7 @@ import com.fit.object.ConfigurationNode;
 public class ProjectLoader {
 	public static void main(String[] args) {
 		// Project tree generation
-		String projectRootPath = "/home/rmrf/builds/dukes-forest";
+		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
 		ProjectNode projectRootNode = ProjectLoader.load(projectRootPath);
 
 		// display tree of project
@@ -50,20 +49,40 @@ public class ProjectLoader {
 		for (String pathItem : children)
 			switch (getTypeOfPath(pathItem)) {
 			case Configuration.CLASS_FILE:
-				ClassNode classNode = new ClassNode(NUMBER_OF_NODES++, pathItem, parent);
+				ClassNode classNode = new ClassNode();
+				classNode.setId(NUMBER_OF_NODES++);
+				classNode.setPath(pathItem);
+				parent.getChildren().add(classNode);
+				classNode.setParent(parent);
 				break;
 			case Configuration.JSP_FILE:
-				JspNode jspFile = new JspNode(NUMBER_OF_NODES++, pathItem, parent);
-
+				JspNode jspFile = new JspNode();
+				jspFile.setId(NUMBER_OF_NODES++);
+				jspFile.setPath(pathItem);
+				parent.getChildren().add(jspFile);
+				jspFile.setParent(parent);
 				break;
 			case Configuration.XHTML_FILE:
-				XhtmlNode xhtmlNode = new XhtmlNode(NUMBER_OF_NODES++, pathItem, parent);
+				XhtmlNode xhtmlNode = new XhtmlNode();
+				xhtmlNode.setId(NUMBER_OF_NODES++);
+				xhtmlNode.setPath(pathItem);
+				parent.getChildren().add(xhtmlNode);
+				xhtmlNode.setParent(parent);
 				break;
 			case Configuration.XML_FILE:
-				ConfigurationNode xmlNode = new ConfigurationNode(NUMBER_OF_NODES++, pathItem, parent);
+				ConfigurationNode xmlNode = new ConfigurationNode();
+				xmlNode.setId(NUMBER_OF_NODES++);
+				xmlNode.setPath(pathItem);
+				parent.getChildren().add(xmlNode);
+				xmlNode.setParent(parent);
 				break;
 			case Configuration.COMPONENT:
-				Node componentNode = new ComponentNode(NUMBER_OF_NODES++, pathItem, parent);
+				Node componentNode = new ComponentNode();
+				componentNode.setId(NUMBER_OF_NODES++);
+				componentNode.setPath(pathItem);
+
+				parent.getChildren().add(componentNode);
+				componentNode.setParent(parent);
 
 				parseSrcFolder(componentNode, pathItem);
 				break;
@@ -77,13 +96,13 @@ public class ProjectLoader {
 	 * @return Kieu doi tuong
 	 */
 	private static int getTypeOfPath(String pathItem) {
-		if (Utils.fileEndsWith(pathItem, CLASS_EXTENSION))
+		if (pathItem.contains(CLASS_SYMBOL))
 			return Configuration.CLASS_FILE;
-		if (Utils.fileEndsWith(pathItem, JSP_EXTENSION))
+		if (pathItem.contains(JSP_SYMBOL))
 			return Configuration.JSP_FILE;
-		if (Utils.fileEndsWith(pathItem, XHTML_EXTENSION))
+		if (pathItem.contains(XHTML_SYMBOL))
 			return Configuration.XHTML_FILE;
-		if (Utils.fileEndsWith(pathItem, XML_EXTENSION) || Utils.fileEndsWith(pathItem, WSDL_EXTENSION))
+		if (pathItem.contains(XML_SYMBOL))
 			return Configuration.XML_FILE;
 
 		// check whether is folder
@@ -106,17 +125,16 @@ public class ProjectLoader {
 		String[] names = file.list();
 
 		for (String name : names) {
-			pathOfChildren.add(path + File.separator + name);
+			pathOfChildren.add(path + "\\" + name);
 		}
 
 		return pathOfChildren;
 	}
 
-	private static final String CLASS_EXTENSION = "java";
-	private static final String XHTML_EXTENSION = "xhtml";
-	private static final String JSP_EXTENSION = "jsp";
-	private static final String XML_EXTENSION = "xml";
-	private static final String WSDL_EXTENSION = "wsdl";
+	private static final String CLASS_SYMBOL = ".java";
+	private static final String XHTML_SYMBOL = ".xhtml";
+	private static final String JSP_SYMBOL = ".jsp";
+	private static final String XML_SYMBOL = ".xml";
 
 	private static int NUMBER_OF_NODES = 0;
 }

@@ -52,12 +52,7 @@ public class CDIProcessor {
 		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
 		if(namedNodes.size() > 0){
 			List<Node> qualifiers = Search.searchNode(projectNode, new CDIQualifierCondition());
-			List<Node> defaultNodes = Search.searchNode(projectNode, new CDIDefaultCondition());
 			
-			if(defaultNodes.size() > 0){
-				// Xu ly cach quy dinh 1 @Inject @Alternative @Default
-				applyCDIContextWithDefault(namedNodes, defaultNodes);
-			}
 			List<String> qulifiersAnotation = extractAnotationFromQualifiers(qualifiers);
 			if(qualifiers.size() > 0){
 				// Xy ly cach quy dinh 2 @Qualifier
