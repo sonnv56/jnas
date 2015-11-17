@@ -1,6 +1,7 @@
 package com.fit.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,6 +97,22 @@ public class Utils {
 			}
 		}
 		return null;
+	}
+	
+	public static String getFileExtension(String path) {
+		String[] pathSegments = path.split(File.separator);
+		String fileName = pathSegments[pathSegments.length - 1];
+		
+		int i = fileName.lastIndexOf('.');
+		if (i == -1) {
+			return "";
+		} else {
+			return fileName.substring(i + 1);
+		}
+	}
+	
+	public static boolean fileEndsWith(String path, String ext) {
+		return getFileExtension(path).toLowerCase().equals(ext.toLowerCase());
 	}
 
 	public static void main(String[] args) {

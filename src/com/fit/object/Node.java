@@ -27,11 +27,19 @@ public abstract class Node {
 	}
 
 	public Node(String path, List<Node> callees, List<Node> callers) {
-		super();
+		this();
 		this.path = path;
 		this.callees = callees;
 		this.callers = callers;
 		this.children = new ArrayList<>();
+	}
+	
+	public Node(int id, String path, Node parent) {
+		this();
+		this.id = id;
+		this.path = path;
+		this.parent = parent;
+		parent.addChild(this);
 	}
 
 	/**
@@ -114,6 +122,10 @@ public abstract class Node {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public boolean addChild(Node n) {
+		return children.add(n);
 	}
 
 	/**
