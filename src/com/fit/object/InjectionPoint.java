@@ -1,12 +1,14 @@
 package com.fit.object;
 
+import org.eclipse.jdt.core.dom.ASTNode;
+
 public class InjectionPoint {
 	/**Node tiem*/
 	private Node injector;
 	/**Node bi tiem*/
 	private Node injectee;
 	/**Cau lenh inject*/
-	private String statement;
+	private ASTNode statement;
 	
 	public InjectionPoint() {
 	}
@@ -22,10 +24,10 @@ public class InjectionPoint {
 	public void setInjector(Node injector) {
 		this.injector = injector;
 	}
-	public void setStatement(String statement) {
+	public void setStatement(ASTNode statement) {
 		this.statement = statement;
 	}
-	public String getStatement() {
+	public ASTNode getStatement() {
 		return statement;
 	}
 }

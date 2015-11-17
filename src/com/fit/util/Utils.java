@@ -92,7 +92,7 @@ public class Utils {
 	/***/
 	public static Node findNodeByPath(Node projectNode, Node node) {
 		for (Node child : Search.searchNode(projectNode, new ClassCondition())) {
-			if (node.getPath().equals(child.getPath())) {
+			if (child !=null && node.getPath()!=null && node.getPath().equals(child.getPath())) {
 				return child;
 			}
 		}

@@ -1,11 +1,21 @@
 package com.fit.process.cdi;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.fit.jdtParser.ClassFileParser;
 import com.fit.loader.ProjectLoader;
@@ -14,7 +24,9 @@ import com.fit.object.ClassNode;
 import com.fit.object.InjectionPoint;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
+import com.fit.process.cdi.condition.CDIBeanCondition;
 import com.fit.process.cdi.condition.CDICustomQualifierCondition;
+import com.fit.process.cdi.condition.CDIDefaultCondition;
 import com.fit.process.cdi.condition.CDINamedCondition;
 import com.fit.process.cdi.condition.CDIObservesCondition;
 import com.fit.process.cdi.condition.CDIProducesCondition;
@@ -27,8 +39,8 @@ public class CDIProcessor2 {
 	private ProjectNode projectNode;
 
 	public static void main(String[] args) {
-		String projectRootPath = "C://Users//son//Downloads//dukes-forest//dukes-forest";
-//		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
+//		String projectRootPath = "C://Users//son//Downloads//dukes-forest//dukes-forest";
+		String projectRootPath = "C://Users//Chicky//Documents//NetBeansProjects//CIASample";
 //		String projectRootPath = "C://Users//Chicky//Desktop//Workspace//Project//CIA//javaee-tutorial-6//examples//case-studies//dukes-forest";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
 		CDIProcessor2 processor = new CDIProcessor2();
@@ -49,42 +61,74 @@ public class CDIProcessor2 {
 		for (InjectionPoint injectionPoint : points) {
 			Node caller = Utils.findNodeByPath(projectNode, injectionPoint.getInjector());
 			Node callee = Utils.findNodeByPath(projectNode, injectionPoint.getInjectee());
-
-			caller.getCallees().add(callee);
-			callee.getCallers().add(caller);
+			if(callee !=null && caller !=null){
+				caller.getCallees().add(callee);
+				callee.getCallers().add(caller);
+				System.out.println(callee.getPath());
+			}
 		}		
 	}
 	private List<InjectionPoint> updateInjectionPointsWithInjectee(List<InjectionPoint> points) {
 		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
 		for (int i =  0; i < points.size(); i++) {
 			InjectionPoint injectionPoint  = points.get(i);
-			String statement = injectionPoint.getStatement();
+			String statement = injectionPoint.getStatement().toString();
 			int index = statement.indexOf(INJEXTION_ANOTATION);
 			if(index!=-1){										//Xac dinh co phai su dung @Injection
 				index = index+INJEXTION_ANOTATION.length()+1;
 				int index2 = statement.indexOf(" ", index);
 				//Lay qualifier
 				String qualifier = statement.substring(index, index2);
+				List<Node> callees = new ArrayList<Node>();
 				if(qualifier.indexOf("@") != -1){				//Neu la qualifier
 					//Bao qualifier o class
-					List<Node> qualifiers = Search.searchNode(projectNode,new CDICustomQualifierCondition(qualifier));
+					callees = Search.searchNode(projectNode,new CDICustomQualifierCondition(qualifier));
 					//Khai bao qualifier bang @Produces
-					if(qualifiers.size() == 0){
-						qualifiers = Search.searchNode(projectNode,new CDIProducesCondition(qualifier));
-					}
+					if(callees.size() == 0)
+						callees = Search.searchNode(projectNode,new CDIProducesCondition(qualifier));
 					//Khai bao qualifier bang @Observes
-					if(qualifiers.size() == 0){	
-						qualifiers = Search.searchNode(projectNode,new CDIObservesCondition(qualifier));
+					if(callees.size() == 0)	
+						callees = Search.searchNode(projectNode,new CDIObservesCondition(qualifier));
+				}else{
+					//Khai bao bang @Default
+					if(injectionPoint.getStatement() instanceof FieldDeclaration){
+						FieldDeclaration field = (FieldDeclaration) injectionPoint.getStatement();
+						String type = field.getType().toString();
+						callees = Search.searchNode(projectNode, new CDIDefaultCondition(type));
+					}else{
+						MethodDeclaration method = (MethodDeclaration) injectionPoint.getStatement();
+						List<SingleVariableDeclaration> parameters = method.parameters();
+						for (SingleVariableDeclaration p : parameters) {
+							if(p.toString().indexOf("@")==-1){
+								String type = p.getType().toString();
+								callees = Search.searchNode(projectNode, new CDIDefaultCondition(type));
+							}else{
+								String customQualifier = extractQualifierFromParameter(p.toString());
+								callees = Search.searchNode(projectNode,new CDICustomQualifierCondition(customQualifier));
+							}
+						}
 					}
-					//Xac dinh chinh xac (truong hop co nhieu qualifiers giong nhau)
-					Node node = getExactNode(qualifiers);
-					injectionPoint.setInjectee(node);
-					result.add(injectionPoint);
+					if(callees.size() == 0){
+						String beanAlternative = findDefaultClassInBeansXML();
+					}
+					//Khai bao bang bean.xml
 				}
+				//Xac dinh chinh xac (truong hop co nhieu qualifiers giong nhau)
+				Node node = getExactNode(callees);
+				injectionPoint.setInjectee(node);
+				result.add(injectionPoint);
 			}
 		}
 		return result;
 	}
+	private String extractQualifierFromParameter(String string) {
+		String qualifier = "";
+		int index1 = string.indexOf("@");
+		int index2 = string.indexOf(" ", index1);
+		qualifier = string.substring(index1, index2).trim();
+		return qualifier;
+	}
+
 	/**
 	 * Xu ly truong hop tim chinh xac vi tri cua injectee
 	 * @param qualifiers
@@ -107,19 +151,19 @@ public class CDIProcessor2 {
 			for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
 //				System.out.println(field.toString());
 				if(field.toString().trim().indexOf(INJEXTION_ANOTATION)!=-1){
-					points.add(createAInjectionPoint(node, field.toString().trim()));
+					points.add(createAInjectionPoint(node, field));
 				}
 			}
 			// Kiem tra cac method
 			for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
 				if(method.toString().trim().indexOf(INJEXTION_ANOTATION)!=-1 ){
-					points.add(createAInjectionPoint(node, method.toString().trim()));
+					points.add(createAInjectionPoint(node, method));
 				}else{
 					if(method.toString().trim().indexOf(PRODUCES_ANOTATION)!=-1){
 						List<SingleVariableDeclaration> parameters = method .parameters();
 						for (SingleVariableDeclaration p : parameters) {
 							if (p.toString().indexOf("@")==-1) {
-								points.add(createAInjectionPoint(node, method.toString().trim()));
+								points.add(createAInjectionPoint(node, method));
 								break;
 							}
 						}
@@ -132,7 +176,7 @@ public class CDIProcessor2 {
 
 
 
-	private InjectionPoint createAInjectionPoint(Node node, String trim) {
+	private InjectionPoint createAInjectionPoint(Node node, ASTNode trim) {
 		InjectionPoint point = new InjectionPoint();
 		point.setInjector(node);
 		point.setStatement(trim);
@@ -144,5 +188,34 @@ public class CDIProcessor2 {
 	}
 	public ProjectNode getProjectNode() {
 		return projectNode;
+	}
+	
+	private String findDefaultClassInBeansXML(){
+		String alternative = "alternatives";
+		String cls = "";
+		List<Node> list = Search.searchNode(projectNode, new CDIBeanCondition());
+		if(list.size() > 0){
+			String bean = list.get(0).getPath();
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder;
+			try {
+				dBuilder = dbFactory.newDocumentBuilder();
+				Document doc = dBuilder.parse(bean);
+				
+				doc.getDocumentElement().normalize();
+				NodeList nList = doc.getElementsByTagName(alternative);
+				for (int temp = 0; temp < nList.getLength(); temp++) {
+					org.w3c.dom.Node nNode = nList.item(temp);
+					if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						return eElement.getTextContent();
+					}
+				}
+			} catch (ParserConfigurationException | SAXException | IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		return cls;
 	}
 }
