@@ -9,10 +9,9 @@ import com.fit.jdtParser.ClassFileParser;
 import com.fit.loader.tree.Condition;
 import com.fit.object.ClassNode;
 import com.fit.object.Node;
+import com.fit.process.cdi.CDIConst;
 
 public class CDIObservesCondition extends Condition {
-	private static String ANOTATION_PREFIX = "@";
-	private static final String OBSERVES_ANOTATION = "@Observes";
 	/** Anotation Named */
 	private String name;
 
@@ -34,13 +33,14 @@ public class CDIObservesCondition extends Condition {
 			ClassFileParser classFileParser = new ClassFileParser(n.getPath());
 			// Kiem tra cac method
 			String anotation = name;
-			if(anotation.indexOf(ANOTATION_PREFIX) == -1){
-				anotation = ANOTATION_PREFIX + name;
+			if(anotation.indexOf(CDIConst.ANNOTATION_PREFIX) == -1){
+				anotation = CDIConst.ANNOTATION_PREFIX + name;
 			}
 			for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
+				@SuppressWarnings("unchecked")
 				List<SingleVariableDeclaration> parameters = method.parameters();
 				for (SingleVariableDeclaration p : parameters) {
-					if(p.toString().trim().indexOf(OBSERVES_ANOTATION + " " + anotation)!=-1){
+					if(p.toString().trim().indexOf(CDIConst.OBSERVES_ANNOTATION + " " + anotation)!=-1){
 						return true;
 					}
 				}

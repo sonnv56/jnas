@@ -6,10 +6,9 @@ import com.fit.jdtParser.ClassFileParser;
 import com.fit.loader.tree.Condition;
 import com.fit.object.ClassNode;
 import com.fit.object.Node;
+import com.fit.process.cdi.CDIConst;
 
 public class CDIProducesCondition extends Condition {
-	private static String ANOTATION_PREFIX = "@";
-	private static final String PRODUCES_ANOTATION = "@Produces";
 	/** Anotation Named */
 	private String name;
 
@@ -31,11 +30,11 @@ public class CDIProducesCondition extends Condition {
 			ClassFileParser classFileParser = new ClassFileParser(n.getPath());
 			// Kiem tra cac method
 			String anotation = name;
-			if(anotation.indexOf(ANOTATION_PREFIX) == -1){
-				anotation = ANOTATION_PREFIX + name;
+			if(anotation.indexOf(CDIConst.ANNOTATION_PREFIX) == -1){
+				anotation = CDIConst.ANNOTATION_PREFIX + name;
 			}
 			for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
-				if(method.toString().trim().indexOf(PRODUCES_ANOTATION + " " + anotation)!=-1){
+				if(method.toString().trim().indexOf(CDIConst.PRODUCES_ANNOTATION + " " + anotation)!=-1){
 					return true;
 				}
 			}
