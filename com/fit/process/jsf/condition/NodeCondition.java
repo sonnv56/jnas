@@ -1,4 +1,4 @@
-package com.fit.process.jsf;
+package com.fit.process.jsf.condition;
 
 import com.fit.loader.tree.Condition;
 import com.fit.object.Node;

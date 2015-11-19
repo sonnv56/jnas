@@ -12,7 +12,7 @@ import com.fit.jdtParser.ClassFileParser;
  */
 public class JdtParserTest {
 	public static void main(String[] args) {
-		String classPath = ConfigurationOfAnh.DUKES_FOREST_PATH2
+		String classPath = ConfigurationOfAnh.JSF_DUKES_FOREST_PATH
 				+ "\\dukes-payment\\src\\java\\com\\forest\\payment\\services\\Payment.java";
 		ClassFileParser classFileParser = new ClassFileParser(classPath);
 

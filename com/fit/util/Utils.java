@@ -1,19 +1,22 @@
 package com.fit.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fit.ducanh.test.ConfigurationOfAnh;
-import com.fit.loader.ProjectLoader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+
+import com.fit.config.Configuration;
 import com.fit.loader.tree.ClassCondition;
 import com.fit.loader.tree.Search;
-import com.fit.object.ClassNode;
 import com.fit.object.Node;
-import com.fit.object.ProjectNode;
-import java.io.File;
+
 /**
  * Bo thu vien cac tinh nang
  */
@@ -78,7 +81,7 @@ public class Utils {
 	 * 
 	 * @param projectRootNode
 	 */
-	public static List<Node> getSubProjectsList(Node projectRootNode) {
+	public static List<Node> getProjects(Node projectRootNode) {
 		List<Node> projects = new ArrayList<Node>();
 		if (Utils.containManyProject(projectRootNode))
 			for (Node subProjectItem : projectRootNode.getChildren())
@@ -91,17 +94,17 @@ public class Utils {
 	/***/
 	public static Node findNodeByPath(Node projectNode, Node node) {
 		for (Node child : Search.searchNode(projectNode, new ClassCondition())) {
-			if (child !=null && node.getPath()!=null && node.getPath().equals(child.getPath())) {
+			if (child != null && node.getPath() != null && node.getPath().equals(child.getPath())) {
 				return child;
 			}
 		}
 		return null;
 	}
-	
+
 	public static String getFileExtension(String path) {
 		String[] pathSegments = path.split(File.separator);
 		String fileName = pathSegments[pathSegments.length - 1];
-			
+
 		int i = fileName.lastIndexOf('.');
 		if (i == -1) {
 			return "";
@@ -109,15 +112,28 @@ public class Utils {
 			return fileName.substring(i + 1);
 		}
 	}
-	
+
 	public static boolean fileEndsWith(String path, String ext) {
 		return getFileExtension(path).toLowerCase().equals(ext.toLowerCase());
-	}	
-	public static void main(String[] args) {
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
-		String test = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest\\dukes-shipment\\src\\java\\com\\forest\\entity\\Person.java";
-		Node node = new ClassNode();
-		node.setPath(test);
-		System.out.println(findNodeByPath(projectRootNode, node));
+	}
+
+	/**
+	 * Lay cau truc DOM cua file xml
+	 * @param path
+	 * @return
+	 */
+	public static Document getDOM(String path) {
+		try {
+			File inputFile = new File(path);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder;
+			dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(inputFile);
+			doc.getDocumentElement().normalize();
+			return doc;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

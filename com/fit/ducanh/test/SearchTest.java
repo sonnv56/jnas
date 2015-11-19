@@ -18,7 +18,7 @@ import com.fit.process.jsf.condition.XHtmlCondition;
 public class SearchTest {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
 		// tim kiem cac class thoa man
 		String relativePath = "com/forest/entity/Administrator.java";

@@ -12,8 +12,8 @@ import com.fit.process.jsf.object.Dependency;
  *
  */
 public class TreeUpdater {
-	public static void createConnection(List<Dependency> dependenciesList) {
-		for (Dependency d : dependenciesList) {
+	public static void createConnection(List<Dependency> dependencies) {
+		for (Dependency d : dependencies) {
 			Node nBiPhuThuoc = d.getBiPhuThuoc();
 			Node nGayPhuThuoc = d.getGayPhuThuoc();
 

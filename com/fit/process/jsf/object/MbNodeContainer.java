@@ -8,12 +8,12 @@ import com.fit.object.ClassNode;
  * @author DucAnh
  *
  */
-public class ManagedBeanNodeContainer {
+public class MbNodeContainer {
 	private ClassNode classNode;
 	/** Ten managed bean su dung de tiem */
 	private String name = "";
 
-	public ManagedBeanNodeContainer(ClassNode classNode) {
+	public MbNodeContainer(ClassNode classNode) {
 		this.classNode = classNode;
 	}
 

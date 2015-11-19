@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.w3c.dom.NodeList;
 
-import com.fit.loader.tree.Search;
 import com.fit.object.Node;
-import com.fit.process.jsf.NodeCondition;
+import com.fit.process.jsf.JsfUtils;
+import com.fit.process.jsf.condition.NodeCondition;
 import com.fit.process.jsf.object.Dependency;
-import com.fit.process.jsf.object.ManagedBeanNodeContainer;
+import com.fit.process.jsf.object.MbNodeContainer;
 import com.fit.process.jsf.object.NavigationRuleTag;
 
 /**
@@ -20,46 +20,48 @@ import com.fit.process.jsf.object.NavigationRuleTag;
  *
  */
 public class NavigationRuleParser extends DependenciesGeneration {
-	NavigationRuleTag navigationRule;
-	List<Node> webPagesList;
-	List<ManagedBeanNodeContainer> managedBeansList;
+	NavigationRuleTag navigationRule_;
+	List<Node> webPages_;
+	List<MbNodeContainer> mbNodeContainers_;
 	Node projectNode;
 
 	public NavigationRuleParser(NavigationRuleTag navigationRule, Node projectNode, List<Node> webPagesList,
-			List<ManagedBeanNodeContainer> managedBeansList) {
-		this.navigationRule = navigationRule;
-		this.webPagesList = webPagesList;
-		this.managedBeansList = managedBeansList;
+			List<MbNodeContainer> managedBeansList) {
+		this.navigationRule_ = navigationRule;
+		this.webPages_ = webPagesList;
+		this.mbNodeContainers_ = managedBeansList;
 		this.projectNode = projectNode;
 
-		dependenciesList = findDependencies();
+		dependencies = findDependencies();
 	}
 
 	/**
+	 * Tao su phu thuoc giua jsf confjg va class
 	 * 
 	 * @param navigationRule
-	 * @param managedBeansList
+	 * @param mbNodeContainers
 	 * @return
 	 */
 	private List<Dependency> linkToManagedBeans(NavigationRuleTag navigationRule,
-			List<ManagedBeanNodeContainer> managedBeansList) {
+			List<MbNodeContainer> mbNodeContainers) {
 		List<Dependency> output = new ArrayList<>();
 		try {
 			/** mot navigation co nhieu from-action */
-			List<Node> dependencyMBClass = new ArrayList<>();
-			NodeList nList = navigationRule.getContent().getElementsByTagName(FROM_ACTION);
+			final List<Node> dependencyMBClasses = new ArrayList<>();
+			final NodeList nList = navigationRule.getContent().getElementsByTagName(FROM_ACTION);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-				org.w3c.dom.Node nTmpNode = nList.item(temp);
-				String command = nTmpNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
-				for (ManagedBeanNodeContainer mbNode : managedBeansList)
+				final org.w3c.dom.Node nTmpNode = nList.item(temp);
+				final String command = nTmpNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
+				for (MbNodeContainer mbNode : mbNodeContainers)
 					if (command.contains("#{" + mbNode.getName() + "."))
-						dependencyMBClass.add(mbNode.getClassNode());
+						dependencyMBClasses.add(mbNode.getClassNode());
 			}
 			/** Tao lien ket */
-			for (Node n : dependencyMBClass) {
-				Dependency d = new Dependency();
-				d.setBiPhuThuoc(n);
+			for (Node classNode : dependencyMBClasses) {
+				final Dependency d = new Dependency();
+				d.setBiPhuThuoc(classNode);
 				d.setGayPhuThuoc(navigationRule.getJSFConfig());
+
 				output.add(d);
 			}
 		} catch (Exception e) {
@@ -68,31 +70,38 @@ public class NavigationRuleParser extends DependenciesGeneration {
 		return output;
 	}
 
-	private List<Dependency> linkToWebPages(NavigationRuleTag navigationRule, List<Node> webPagesList) {
+	/**
+	 * Tao su phu thuoc giua jsf config va web page
+	 * 
+	 * @param navigationRule
+	 * @param webPages
+	 * @return
+	 */
+	private List<Dependency> linkToWebPages(NavigationRuleTag navigationRule, List<Node> webPages) {
 		List<Dependency> output = new ArrayList<>();
 		try {
-			String relativeWebsPath;
+			String relativeWebPath;
 			List<Node> dependencyWebPages = new ArrayList<>();
 			/** mot navigation chi co mot from-view-id */
-			org.w3c.dom.Node nNode = navigationRule.getContent().getElementsByTagName(FROM_WIEW_ID).item(0);
+			final org.w3c.dom.Node nNode = navigationRule.getContent().getElementsByTagName(FROM_WIEW_ID).item(0);
 
 			// Neu nevigation-rule dinh nghia from-view-id
 			if (nNode != null) {
-				relativeWebsPath = nNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
-				dependencyWebPages = Search.searchNode(projectNode, new NodeCondition(), relativeWebsPath);
+				relativeWebPath = nNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
+				dependencyWebPages = JsfUtils.searchNode(projectNode, new NodeCondition(), relativeWebPath);
 			}
 
 			/** mot navigation co nhieu to-view-id */
 			NodeList nList = navigationRule.getContent().getElementsByTagName(TO_WIEW_ID);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-				org.w3c.dom.Node nTmpNode = nList.item(temp);
-				relativeWebsPath = nTmpNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
-				dependencyWebPages.addAll(Search.searchNode(projectNode, new NodeCondition(), relativeWebsPath));
+				final org.w3c.dom.Node nTmpNode = nList.item(temp);
+				relativeWebPath = nTmpNode.getTextContent().replace("\n", "").replace(" ", "").replace("\r", "");
+				dependencyWebPages.addAll(JsfUtils.searchNode(projectNode, new NodeCondition(), relativeWebPath));
 			}
 
 			/** Tao lien ket */
 			for (Node n : dependencyWebPages) {
-				Dependency d = new Dependency();
+				final Dependency d = new Dependency();
 				d.setBiPhuThuoc(n);
 				d.setGayPhuThuoc(navigationRule.getJSFConfig());
 				output.add(d);
@@ -106,8 +115,8 @@ public class NavigationRuleParser extends DependenciesGeneration {
 	@Override
 	public List<Dependency> findDependencies() {
 		List<Dependency> output = new ArrayList<>();
-		output.addAll(linkToManagedBeans(navigationRule, managedBeansList));
-		output.addAll(linkToWebPages(navigationRule, webPagesList));
+		output.addAll(linkToManagedBeans(navigationRule_, mbNodeContainers_));
+		output.addAll(linkToWebPages(navigationRule_, webPages_));
 		return output;
 	}
 

@@ -15,7 +15,7 @@ import com.fit.loader.tree.Search;
 import com.fit.object.ClassNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
-import com.fit.process.jsf.object.ManagedBeanNodeContainer;
+import com.fit.process.jsf.object.MbNodeContainer;
 
 /**
  * Lay danh sach ten cac managed bean trong project duoc dinh nghia trong cac
@@ -24,39 +24,38 @@ import com.fit.process.jsf.object.ManagedBeanNodeContainer;
  * @author DucAnh
  *
  */
-public class CollectManagedBeanFromJavaFile {
-	private List<ManagedBeanNodeContainer> listManagedBeanNodes = new ArrayList<ManagedBeanNodeContainer>();
+public class CollectMbFromJavaFile {
+	private List<MbNodeContainer> mbNodes_ = new ArrayList<MbNodeContainer>();
 
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
-		List<ManagedBeanNodeContainer> output = new CollectManagedBeanFromJavaFile(projectRootNode)
-				.getListManagedBeanNodes();
-		for (ManagedBeanNodeContainer n : output) {
+		List<MbNodeContainer> output = new CollectMbFromJavaFile(projectRootNode).getMbNodes();
+		for (MbNodeContainer n : output) {
 			System.out.println(n.getClassNode().getPath());
 		}
 	}
 
-	public CollectManagedBeanFromJavaFile(Node projectNode) {
-		listManagedBeanNodes = getManagedBeansList(projectNode);
+	public CollectMbFromJavaFile(Node projectNode) {
+		mbNodes_ = getManagedBeans(projectNode);
 	}
 
-	public List<ManagedBeanNodeContainer> getListManagedBeanNodes() {
-		return listManagedBeanNodes;
+	public List<MbNodeContainer> getMbNodes() {
+		return mbNodes_;
 	}
 
-	private List<ManagedBeanNodeContainer> getManagedBeansList(Node projectNode) {
-		List<ManagedBeanNodeContainer> listManagedBeanNodes = new ArrayList<ManagedBeanNodeContainer>();
+	private List<MbNodeContainer> getManagedBeans(Node projectNode) {
+		List<MbNodeContainer> mbNodes = new ArrayList<MbNodeContainer>();
 
-		List<Node> listNode = Search.searchNode(projectNode, new ManagedBeanCondition());
-		for (Node n : listNode) {
-			ManagedBeanNodeContainer managedBean = new ManagedBeanNodeContainer((ClassNode) n);
-			String name = getManagedName(n);
+		List<Node> nodes = Search.searchNode(projectNode, new ManagedBeanCondition());
+		for (Node node : nodes) {
+			MbNodeContainer managedBean = new MbNodeContainer((ClassNode) node);
+			String name = getManagedBeanName(node);
 			managedBean.setName(name);
-			listManagedBeanNodes.add(managedBean);
+			mbNodes.add(managedBean);
 		}
-		return listManagedBeanNodes;
+		return mbNodes;
 	}
 
 	/**
@@ -65,7 +64,7 @@ public class CollectManagedBeanFromJavaFile {
 	 * @param managedNode
 	 * @return
 	 */
-	private String getManagedName(Node managedNode) {
+	private String getManagedBeanName(Node managedNode) {
 		String managedName = "";
 		ClassFileParser classParser = new ClassFileParser(managedNode);
 
@@ -73,8 +72,9 @@ public class CollectManagedBeanFromJavaFile {
 			String managedBeanAnnotation = m.toString();
 
 			if (m.toString().contains(MANAGED_BEAN_ANNOTATION)) {
-				managedName = parseManageBeanAnnotation(managedBeanAnnotation);
-				// managed bean file khong duoc dinh nghia ten
+				managedName = parseMbAnnotation(managedBeanAnnotation);
+				
+				/** managed bean file khong dinh nghia ten */
 				if (managedName.length() == 0) {
 					managedName = managedNode.getNodeName().replace(".java", "");
 				}
@@ -88,15 +88,15 @@ public class CollectManagedBeanFromJavaFile {
 	/**
 	 * Lay ten managed bean
 	 * 
-	 * @param managedBeanAnnotation
+	 * @param mbAnnotation
 	 *            Annotation khai bao mot class la managed bean
 	 * @return
 	 */
-	private String parseManageBeanAnnotation(String managedBeanAnnotation) {
+	private String parseMbAnnotation(String mbAnnotation) {
 		String managedName = "";
 
 		Pattern p = Pattern.compile(MANAGED_BEAN_NAME_DECLARATION_EXPRESSION);
-		Matcher m = p.matcher(managedBeanAnnotation);
+		Matcher m = p.matcher(mbAnnotation);
 
 		if (m.find()) {
 			managedName = m.group(1);

@@ -12,11 +12,11 @@ import com.fit.process.jsf.object.Dependency;
  *
  */
 public abstract class DependenciesGeneration {
-	protected List<Dependency> dependenciesList = new ArrayList<Dependency>();
+	protected List<Dependency> dependencies = new ArrayList<Dependency>();
 
-	public abstract List<Dependency> findDependencies();
+	protected abstract List<Dependency> findDependencies();
 
-	public List<Dependency> getDependenciesList() {
-		return dependenciesList;
+	public List<Dependency> getDependencies() {
+		return dependencies;
 	}
 }

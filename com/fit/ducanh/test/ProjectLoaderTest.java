@@ -13,7 +13,7 @@ import com.fit.object.ProjectNode;
 public class ProjectLoaderTest {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
 		// display tree of project
 		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);

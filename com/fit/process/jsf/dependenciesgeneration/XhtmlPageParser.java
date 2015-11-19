@@ -5,17 +5,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import com.fit.loader.tree.Search;
 import com.fit.object.Node;
+import com.fit.process.jsf.JsfUtils;
 import com.fit.process.jsf.condition.CssCondition;
 import com.fit.process.jsf.object.Dependency;
-import com.fit.process.jsf.object.ManagedBeanNodeContainer;
+import com.fit.process.jsf.object.MbNodeContainer;
 import com.fit.util.Utils;
 
 /**
@@ -25,41 +19,44 @@ import com.fit.util.Utils;
  * @author DucAnh
  *
  */
-public class XhtmlWebPageParser extends DependenciesGeneration {
-	List<ManagedBeanNodeContainer> managedBeanList;
-	Node webPage;
-	Node projectNode;
+public class XhtmlPageParser extends DependenciesGeneration {
+	private List<MbNodeContainer> mbNodeContainers_;
+	private Node webPageNode_;
+	private Node projectNode_;
 
-	public XhtmlWebPageParser(Node webPage, Node projectNode, List<ManagedBeanNodeContainer> managedBeanList) {
-		this.managedBeanList = managedBeanList;
-		this.webPage = webPage;
-		this.projectNode = projectNode;
-		dependenciesList = findDependencies();
+	public XhtmlPageParser(Node webPage, Node projectNode, List<MbNodeContainer> mbNodeContainers) {
+		this.mbNodeContainers_ = mbNodeContainers;
+		this.webPageNode_ = webPage;
+		this.projectNode_ = projectNode;
+
+		dependencies = findDependencies();
 	}
 
 	@Override
 	public List<Dependency> findDependencies() {
 		List<Dependency> output = new ArrayList<>();
 		try {
-			String fileContent = Utils.readFileContent(webPage.getPath());
+			final String fileContent = Utils.readFileContent(webPageNode_.getPath());
 
 			/** Tim su phu thuoc giua web page va CSS Node */
-			List<String> relativeCssPaths = findCssDeclaration(fileContent);
+			final List<String> relativeCssPaths = findCssDeclaration(fileContent);
 			for (String relativeCssPath : relativeCssPaths) {
-				List<Node> cssNodeList = Search.searchNode(projectNode, new CssCondition(), relativeCssPath);
-				for (Node cssNode : cssNodeList) {
-					Dependency d = new Dependency();
+				final List<Node> cssNodes = JsfUtils.searchNode(projectNode_, new CssCondition(), relativeCssPath);
+				for (Node cssNode : cssNodes) {
+					final Dependency d = new Dependency();
 					d.setBiPhuThuoc(cssNode);
-					d.setGayPhuThuoc(webPage);
+					d.setGayPhuThuoc(webPageNode_);
+
 					output.add(d);
 				}
 			}
 			/** Tim su phu thuoc web page va managed bean file */
-			for (ManagedBeanNodeContainer mbNode : managedBeanList) {
-				if (fileContent.contains("#{" + mbNode.getName() + ".")) {
-					Dependency d = new Dependency();
-					d.setBiPhuThuoc(mbNode.getClassNode());
-					d.setGayPhuThuoc(webPage);
+			for (MbNodeContainer mbNodeContainer : mbNodeContainers_) {
+				if (fileContent.contains("#{" + mbNodeContainer.getName() + ".")) {
+					final Dependency d = new Dependency();
+					d.setBiPhuThuoc(mbNodeContainer.getClassNode());
+					d.setGayPhuThuoc(webPageNode_);
+
 					output.add(d);
 				}
 			}
@@ -87,6 +84,5 @@ public class XhtmlWebPageParser extends DependenciesGeneration {
 		return relativeCssPaths;
 	}
 
-	private static final String LINK = "link";
 	private static final String CSS_REGEX = "href=\"(.*\\.css)\"";
 }

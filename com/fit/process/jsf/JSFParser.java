@@ -22,10 +22,10 @@ import com.fit.process.jsf.condition.XHtmlCondition;
 import com.fit.process.jsf.dependenciesgeneration.ManagedBeanTagParser;
 import com.fit.process.jsf.dependenciesgeneration.NavigationRuleParser;
 import com.fit.process.jsf.dependenciesgeneration.WebConfigParser;
-import com.fit.process.jsf.dependenciesgeneration.XhtmlWebPageParser;
+import com.fit.process.jsf.dependenciesgeneration.XhtmlPageParser;
 import com.fit.process.jsf.object.Dependency;
-import com.fit.process.jsf.object.ManagedBeanNodeContainer;
 import com.fit.process.jsf.object.ManagedBeanTag;
+import com.fit.process.jsf.object.MbNodeContainer;
 import com.fit.process.jsf.object.NavigationRuleTag;
 import com.fit.util.Utils;
 
@@ -36,78 +36,74 @@ import com.fit.util.Utils;
  *
  */
 public class JSFParser implements IProjectParser {
-	private final Node projectRootNode;
-	private List<Dependency> dependenciesList = new ArrayList<Dependency>();
+	private final Node projectRootNode_;
+	private List<Dependency> dependencies_ = new ArrayList<Dependency>();
 
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.DUKES_FOREST_PATH);
-		List<Dependency> dependenciesList = new JSFParser(projectRootNode).getDependenciesList();
-		for (Dependency d : dependenciesList)
-			System.out.println(d.toString());
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
+		List<Dependency> dependencies = new JSFParser(projectRootNode).getDependenciesList();
+		for (Dependency dependency : dependencies)
+			System.out.println(dependency.toString());
 	}
 
 	public JSFParser(Node projectRootNode) {
-		this.projectRootNode = projectRootNode;
+		this.projectRootNode_ = projectRootNode;
 		parse();
 	}
 
 	@Override
 	public void parse() {
-		final List<Node> subProjectNodeList = Utils.getSubProjectsList(projectRootNode);
+		final List<Node> projectNodes = Utils.getProjects(projectRootNode_);
 
-		for (Node subProjectNode : subProjectNodeList)
-			if (Search.searchNode(subProjectNode, new ConfigurationCondition(), "\\web\\WEB-INF\\web.xml").size() > 0) {
+		for (Node projectNode : projectNodes)
+			if (useJsfTechnology(projectNode)) {
 				/** Tim va phan tich web.xml */
-				final WebConfigParser webConfigParser = new WebConfigParser(subProjectNode);
-				final List<Node> listConfigJSFNode = webConfigParser.getListConfigJSFNode();
+				final WebConfigParser webConfigParser = new WebConfigParser(projectNode);
+				final List<Node> jsfConfigNodes = webConfigParser.getListConfigJSFNode();
+				final List<Dependency> dependencies = webConfigParser.getDependencies();
+				
+				ParamaterWebConfig.URL_PATTERN = webConfigParser.getUriPattern();
+				dependencies_.addAll(dependencies);
 
-				dependenciesList.addAll(webConfigParser.getDependenciesList());
+				/** Lay danh sach managed bean duoc dinh nghia trong file */
+				List<MbNodeContainer> mbNodes = new CollectMbFromJavaFile(projectNode).getMbNodes();
 
-				/**
-				 * Lay danh sach managed bean duoc dinh nghia trong file java va
-				 * JSF config
-				 */
-				// Lay danh sach managed bean duoc dinh nghia trong file
-				final List<ManagedBeanNodeContainer> managedBeansList = new CollectManagedBeanFromJavaFile(
-						subProjectNode).getListManagedBeanNodes();
+				/** Luu tat ca cac node managed bean trong config */
+				for (Node jsfConfigNode : jsfConfigNodes) {
+					final List<ManagedBeanTag> mbTags = getManagedBeanTagList(jsfConfigNode);
 
-				// luu tat ca cac node managed bean trong config
-				for (Node configJSFNode : listConfigJSFNode) {
-					List<ManagedBeanTag> managedBeanTagList = getManagedBeanTag(configJSFNode);
-					for (ManagedBeanTag managedBeanTag : managedBeanTagList) {
-						final ManagedBeanTagParser managedBeanTagParser = new ManagedBeanTagParser(managedBeanTag,
-								subProjectNode);
-						final List<ManagedBeanNodeContainer> mbNodeContainerList = managedBeanTagParser
-								.getManagedBean();
-						managedBeansList.addAll(mbNodeContainerList);
+					for (ManagedBeanTag mbTag : mbTags) {
+						final ManagedBeanTagParser mBTagParser = new ManagedBeanTagParser(mbTag, projectNode);
 
-						// get dependency
-						dependenciesList.addAll(managedBeanTagParser.getDependenciesList());
+						final List<MbNodeContainer> mbNodeContainers = mBTagParser.getManagedBeanContainers();
+						mbNodes.addAll(mbNodeContainers);
+
+						final List<Dependency> dependencies2 = mBTagParser.getDependencies();
+						dependencies_.addAll(dependencies2);
 					}
 				}
 
 				/** Tim va phan tich navigation rule trong JSF config */
-				final List<Node> webPagesList = getWebPagesList(subProjectNode);
-				for (Node configJSFNode : listConfigJSFNode) {
-					List<NavigationRuleTag> navigationRuleList = getNavigationRule(configJSFNode);
+				final List<Node> webPageNodes = getWebPagesList(projectNode);
+				for (Node configJSFNode : jsfConfigNodes) {
+					List<NavigationRuleTag> navigationRules = getNavigationRule(configJSFNode);
 
-					for (NavigationRuleTag navigationRule : navigationRuleList) {
-						final NavigationRuleParser parser = new NavigationRuleParser(navigationRule, subProjectNode,
-								webPagesList, managedBeansList);
+					for (NavigationRuleTag navigationRule : navigationRules) {
+						final NavigationRuleParser parser = new NavigationRuleParser(navigationRule, projectNode,
+								webPageNodes, mbNodes);
 
-						// get dependency
-						dependenciesList.addAll(parser.getDependenciesList());
+						final List<Dependency> dependencies2 = parser.getDependencies();
+						dependencies_.addAll(dependencies2);
 					}
 				}
 
 				/** Tim va phan tich web pages */
-				for (Node webPage : webPagesList) {
-					final XhtmlWebPageParser xhtmlWebPageParser = new XhtmlWebPageParser(webPage, subProjectNode,
-							managedBeansList);
+				for (Node webPage : webPageNodes) {
+					final XhtmlPageParser xhtmlWebPageParser = new XhtmlPageParser(webPage, projectNode, mbNodes);
 
-					// get dependency
-					dependenciesList.addAll(xhtmlWebPageParser.getDependenciesList());
+					final List<Dependency> dependencies2 = xhtmlWebPageParser.getDependencies();
+					dependencies_.addAll(dependencies2);
 				}
 			}
 	}
@@ -118,8 +114,8 @@ public class JSFParser implements IProjectParser {
 	 * @param webConfig
 	 * @return
 	 */
-	private List<ManagedBeanTag> getManagedBeanTag(Node confjgJSFNode) {
-		List<ManagedBeanTag> managedBeanList = new ArrayList<>();
+	private List<ManagedBeanTag> getManagedBeanTagList(Node confjgJSFNode) {
+		List<ManagedBeanTag> mbTags = new ArrayList<>();
 		final String MANAGED_BEAN_TAG = "managed-bean";
 		try {
 			// default code
@@ -138,13 +134,13 @@ public class JSFParser implements IProjectParser {
 				mbTag.setContent(nTmpNode);
 				mbTag.setJSFConfig(confjgJSFNode);
 
-				managedBeanList.add(mbTag);
+				mbTags.add(mbTag);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return managedBeanList;
+		return mbTags;
 	}
 
 	/**
@@ -154,7 +150,7 @@ public class JSFParser implements IProjectParser {
 	 * @return
 	 */
 	private List<NavigationRuleTag> getNavigationRule(Node confjgJSFNode) {
-		List<NavigationRuleTag> navigationRuleList = new ArrayList<>();
+		List<NavigationRuleTag> navigationRules = new ArrayList<>();
 		final String NAVIGATION_RULE_TAG = "navigation-rule";
 		try {
 			// default code
@@ -173,13 +169,13 @@ public class JSFParser implements IProjectParser {
 				nrTag.setContent(nTmpNode);
 				nrTag.setJSFConfig(confjgJSFNode);
 
-				navigationRuleList.add(nrTag);
+				navigationRules.add(nrTag);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return navigationRuleList;
+		return navigationRules;
 	}
 
 	/**
@@ -190,13 +186,40 @@ public class JSFParser implements IProjectParser {
 	 * @return
 	 */
 	private List<Node> getWebPagesList(Node projectNode) {
-		List<Node> listWebPagesList = Search.searchNode(projectNode, new XHtmlCondition());
-		List<Node> listJspNodes = Search.searchNode(projectNode, new JspCondition());
-		listWebPagesList.addAll(listJspNodes);
-		return listWebPagesList;
+		List<Node> xhtmlNodes = Search.searchNode(projectNode, new XHtmlCondition());
+		List<Node> jspNodes = Search.searchNode(projectNode, new JspCondition());
+		xhtmlNodes.addAll(jspNodes);
+		return xhtmlNodes;
+	}
+
+	/**
+	 * Kiem tra project co su dung cong nghe JSF khong
+	 * 
+	 * @param project
+	 * @return
+	 */
+	private boolean useJsfTechnology(Node project) {
+		final List<Node> webConfigNodes = JsfUtils.searchNode(project, new ConfigurationCondition(), "\\web.xml");
+
+		if (webConfigNodes.size() > 0) {
+			final Document doc = Utils.getDOM(webConfigNodes.get(0).getPath());
+
+			final String SERVLET_CLASS_TAG = "servlet-class";
+			final NodeList nList = doc.getElementsByTagName(SERVLET_CLASS_TAG);
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+				final org.w3c.dom.Node nTmpNode = nList.item(temp);
+				final String content = nTmpNode.getTextContent();
+
+				final String JSF_SYMBOL = "javax.faces.webapp.FacesServlet";
+				if (content != null && content.equals(JSF_SYMBOL))
+					return true;
+			}
+		}
+		return false;
 	}
 
 	public List<Dependency> getDependenciesList() {
-		return dependenciesList;
+		return dependencies_;
 	}
 }

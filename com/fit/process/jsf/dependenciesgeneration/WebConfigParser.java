@@ -1,11 +1,7 @@
 package com.fit.process.jsf.dependenciesgeneration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,11 +9,12 @@ import org.w3c.dom.NodeList;
 
 import com.fit.ducanh.test.ConfigurationOfAnh;
 import com.fit.loader.ProjectLoader;
-import com.fit.loader.tree.Search;
 import com.fit.object.ConfigurationNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
+import com.fit.process.jsf.JsfUtils;
 import com.fit.process.jsf.condition.ConfigurationCondition;
+import com.fit.process.jsf.condition.WebPageCondition;
 import com.fit.process.jsf.object.Dependency;
 import com.fit.util.Utils;
 
@@ -25,15 +22,17 @@ import com.fit.util.Utils;
  * 
  * Input: Mot project con <br/>
  * Output: Danh sach su phu thuoc (web.xml, JSFConfigfiles), danh sach JSFConfig
- * files
+ * files, uri pattern
  * 
  * @author DucAnh
  *
  */
 public class WebConfigParser extends DependenciesGeneration {
-	private List<Node> listConfigJSFNode = new ArrayList<>();
-	private Node webConfig = new ConfigurationNode();
-	private Node projectRootNode;
+	private List<Node> jsfConfigNodes_ = new ArrayList<>();
+	private Node webConfig_ = new ConfigurationNode();
+	private Node projectRootNode_;
+	private String urlPattern_;
+	private List<Node> welcomeNodes_;
 
 	public static void main(String[] args) {
 		// Project tree generation
@@ -49,9 +48,15 @@ public class WebConfigParser extends DependenciesGeneration {
 		}
 
 		System.out.println("Dependencies List:");
-		for (Dependency n : parser.getDependenciesList()) {
+		for (Dependency n : parser.getDependencies()) {
 			System.out.println(n.toString());
 		}
+
+		System.out.println("URL pattern: ");
+		System.out.println(parser.getUriPattern());
+
+		System.out.println("Welcome files: ");
+		System.out.println(parser.getWelcomeNodes());
 	}
 
 	/**
@@ -60,20 +65,70 @@ public class WebConfigParser extends DependenciesGeneration {
 	 *            project con
 	 */
 	public WebConfigParser(Node projectNode) {
-		this.projectRootNode = projectNode;
-		webConfig = findWebConfig(projectNode);
-		listConfigJSFNode = findListConfigJSFNode(projectNode, webConfig);
-		dependenciesList = findDependencies();
+		this.projectRootNode_ = projectNode;
+
+		webConfig_ = findWebConfigNode(projectNode);
+
+		Document dom = Utils.getDOM(webConfig_.getPath());
+		if (dom != null) {
+			welcomeNodes_ = findWelcomeNodes(dom);
+			urlPattern_ = findUrlPattern(dom);
+			if (urlPattern_ != null) {
+				jsfConfigNodes_ = findJsfConfigNodes(dom, projectNode);
+				dependencies = findDependencies();
+			}
+		}
 	}
 
-	private Node findWebConfig(Node projectNode) {
-		// Tim kiem Node web.xml
-		List<Node> webConfig = Search.searchNode(projectNode, new ConfigurationCondition(),
-				projectNode.getNodeName() + "\\web\\WEB-INF\\web.xml");
-		if (webConfig == null || webConfig.size() == 0)
-			return null;
-		Node selectedWebConfig = webConfig.get(0);
-		return selectedWebConfig;
+	/**
+	 * Tim danh sach welcome file nodes duoc dinh nghia
+	 * 
+	 * @param dom
+	 * @return
+	 */
+	private List<Node> findWelcomeNodes(Document dom) {
+		List<Node> output = new ArrayList<>();
+
+		final String WELCOME_FILE_TAG = "welcome-file";
+
+		final NodeList welcomeFileNodes = findTag(dom, WELCOME_FILE_TAG);
+		for (int temp = 0; temp < welcomeFileNodes.getLength(); temp++) {
+			final org.w3c.dom.Node nTmpNode = welcomeFileNodes.item(temp);
+			String relativeWelcomeFile = normalize(nTmpNode.getTextContent());
+
+			final List<Node> welcomeNodes = JsfUtils.searchNode(projectRootNode_, new WebPageCondition(),
+					relativeWelcomeFile);
+			output.addAll(welcomeNodes);
+		}
+		return output;
+	}
+
+	/**
+	 * Tim kiem Node web.xml
+	 * 
+	 * @param projectNode
+	 * @return
+	 */
+	private Node findWebConfigNode(Node projectNode) {
+		final List<Node> webConfig = JsfUtils.searchNode(projectNode, new ConfigurationCondition(), WEB_CONFIG_PATH);
+		if (webConfig.size() != 0) {
+			final Node selectedWebConfig = webConfig.get(0);
+			return selectedWebConfig;
+		}
+		return null;
+	}
+
+	/**
+	 * Tim url-pattern cuar JSF
+	 * 
+	 * @param doc
+	 * @return
+	 */
+	private String findUrlPattern(Document doc) {
+		String uriPattern = null;
+		NodeList tag = findTag(doc, URL_PATTERN);
+		uriPattern = tag.item(0).getTextContent();
+		return uriPattern;
 	}
 
 	/**
@@ -82,59 +137,75 @@ public class WebConfigParser extends DependenciesGeneration {
 	 * @param projectNode
 	 * @return
 	 */
-	private List<Node> findListConfigJSFNode(Node projectNode, Node nWebConfig) {
+	private List<Node> findJsfConfigNodes(Document doc, Node projectNode) {
 		List<Node> listConfigJSFNode = new ArrayList<>();
 
+		// Lay duong dan tuyet doi file face-config.xml
+		final List<Node> faces_config = JsfUtils.searchNode(projectNode, new ConfigurationCondition(),
+				DEFAULT_JSF_CONFIG_NAME);
+		if (faces_config.size() == 1) {
+			listConfigJSFNode.add(faces_config.get(0));
+		}
+
 		// Lay duong dan tuyet doi cac file config trong web.xml
-		String[] configsFile = parseConfigFile(nWebConfig);
+		final String[] configsFile = getRelativePathOfJSFConfig(doc);
 		if (configsFile != null)
 			for (String config : configsFile) {
 
 				// Lay node tuong ung voi duong dan tuong doi file cau hinh
-				List<Node> configList = Search.searchNode(projectNode, new ConfigurationCondition(),
-						projectNode.getNodeName() + "\\web" + config);
-
-				if (configList == null || configList.size() == 0) {
-					// de phong truong hop xay ra
-				} else if (configList.size() == 1) {
-					// hien nhien dung
-					Node configPath = configList.get(0);
+				List<Node> configList = JsfUtils.searchNode(projectNode, new ConfigurationCondition(), config);
+				if (configList.size() == 1) {
+					final Node configPath = configList.get(0);
 					listConfigJSFNode.add(configPath);
 				}
 			}
-
 		return listConfigJSFNode;
 	}
 
+	@Override
+	protected List<Dependency> findDependencies() {
+		List<Dependency> dependencies = new ArrayList<>();
+		for (Node JSFConfig : jsfConfigNodes_) {
+			final Dependency d = new Dependency();
+			d.setBiPhuThuoc(JSFConfig);
+			d.setGayPhuThuoc(webConfig_);
+
+			dependencies.add(d);
+		}
+
+		for (Node welcomeFileNode : welcomeNodes_) {
+			final Dependency d = new Dependency();
+			d.setBiPhuThuoc(welcomeFileNode);
+			d.setGayPhuThuoc(webConfig_);
+
+			dependencies.add(d);
+		}
+		return dependencies;
+	}
+
+	// -------------------------------------------------------------------------------------------------------
 	/**
 	 * Lay duong dan tuong doi cac file cau hinh JSF
 	 * 
-	 * @param selectedWebConfig
 	 * @return
 	 */
-	private String[] parseConfigFile(Node selectedWebConfig) {
+	private String[] getRelativePathOfJSFConfig(Document doc) {
 		try {
-			// default code
-			File inputFile = new File(selectedWebConfig.getPath());
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(inputFile);
-			doc.getDocumentElement().normalize();
-
-			// our code
-			NodeList nList = doc.getElementsByTagName(CONTEXT_TAG);
+			final NodeList nList = findTag(doc, CONTEXT_PARAM_TAG);
 			for (int temp = 0; temp < nList.getLength(); temp++) {
-				org.w3c.dom.Node nNode = nList.item(temp);
+				final org.w3c.dom.Node nNode = nList.item(temp);
 
 				if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-					String paramName = eElement.getElementsByTagName(PARAM_NAME_TAG).item(0).getTextContent();
-					if (paramName.equals(CONFIG_FILES_TAG)) {
-						String paramNameList = eElement.getElementsByTagName(PARAM_VALUE_TAG).item(0).getTextContent();
+					final Element eElement = (Element) nNode;
+					final String paramName = findTag(eElement, PARAM_NAME_TAG).item(0).getTextContent();
 
-						// Loai bo cac ki tu thua
-						paramNameList = paramNameList.replace("\n", "").replace(" ", "").replace("\r", "");
-						return paramNameList.split(",");
+					if (paramName != null && paramName.equals(CONFIG_FILES_TAG)) {
+						String paramNameList = findTag(eElement, PARAM_VALUE_TAG).item(0).getTextContent();
+						if (paramNameList != null) {
+							// Loai bo cac ki tu thua
+							paramNameList = normalize(paramNameList);
+							return paramNameList.split(",");
+						}
 					}
 				}
 			}
@@ -144,32 +215,39 @@ public class WebConfigParser extends DependenciesGeneration {
 		return null;
 	}
 
-	public List<Node> getListConfigJSFNode() {
-		List<Node> faces_config = Search.searchNode(projectRootNode, new ConfigurationCondition(),projectRootNode.getNodeName() + "\\web\\WEB-INF\\faces-config.xml");
-		if (faces_config.size()>0){
-			listConfigJSFNode.addAll(faces_config);
-		}
-		return listConfigJSFNode;
+	private NodeList findTag(Document doc, String tag) {
+		return doc.getElementsByTagName(tag);
 	}
 
-	@Override
-	public List<Dependency> findDependencies() {
-		List<Dependency> dependenciesList = new ArrayList<>();
-		for (Node JSFConfig : listConfigJSFNode) {
-			Dependency d = new Dependency();
-			d.setBiPhuThuoc(JSFConfig);
-			d.setGayPhuThuoc(webConfig);
-			dependenciesList.add(d);
-		}
-		return dependenciesList;
+	private String normalize(String str) {
+		return str.replace("\n", "").replace(" ", "").replace("\r", "");
+	}
+
+	private NodeList findTag(Element e, String tag) {
+		return e.getElementsByTagName(tag);
+	}
+
+	public List<Node> getListConfigJSFNode() {
+		return jsfConfigNodes_;
 	}
 
 	public Node getWebConfig() {
-		return webConfig;
+		return webConfig_;
+	}
+
+	public String getUriPattern() {
+		return urlPattern_;
+	}
+
+	public List<Node> getWelcomeNodes() {
+		return welcomeNodes_;
 	}
 
 	private static final String CONFIG_FILES_TAG = "javax.faces.CONFIG_FILES";
-	private static final String CONTEXT_TAG = "context-param";
+	private static final String CONTEXT_PARAM_TAG = "context-param";
 	private static final String PARAM_NAME_TAG = "param-name";
 	private static final String PARAM_VALUE_TAG = "param-value";
+	private static final String URL_PATTERN = "url-pattern";
+	private static final String WEB_CONFIG_PATH = "\\web\\WEB-INF\\web.xml";
+	private static final String DEFAULT_JSF_CONFIG_NAME = "faces-config.xml";
 }
