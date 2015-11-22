@@ -4,13 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.fit.config.Configuration;
-import com.fit.ducanh.test.displayTree.TreeStrategy;
+import com.fit.ducanh.test.ConfigurationOfAnh;
 import com.fit.object.ClassNode;
 import com.fit.object.ComponentNode;
 import com.fit.object.JspNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.object.XhtmlNode;
+import com.fit.process.tostring.TreeStrategy;
 import com.fit.object.ConfigurationNode;
 
 /**
@@ -19,8 +20,7 @@ import com.fit.object.ConfigurationNode;
 public class ProjectLoader {
 	public static void main(String[] args) {
 		// Project tree generation
-		String projectRootPath = "C:\\Users\\DucAnh\\Dropbox\\Workspace\\Download project\\DEMO J2EE 2\\dukes-forest\\dukes-forest";
-		ProjectNode projectRootNode = ProjectLoader.load(projectRootPath);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
 
 		// display tree of project
 		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);

@@ -1,8 +1,8 @@
 package com.fit.ducanh.test;
 
-import com.fit.ducanh.test.displayTree.TreeStrategy;
 import com.fit.loader.ProjectLoader;
 import com.fit.object.ProjectNode;
+import com.fit.process.tostring.TreeStrategy;
 
 /**
  * Test ProjectLoad class
