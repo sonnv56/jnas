@@ -28,7 +28,7 @@ public class TreeStrategy implements IToString {
 	}
 
 	private void displayTree(Node n, int level) {
-		if (n == null)
+		if (n == null || n.getPath() == null)
 			return;
 		else {
 			output += genTab(level) + "[" + n.getId() + "]" + n.getNodeName() + "\n";
