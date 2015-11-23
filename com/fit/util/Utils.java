@@ -2,8 +2,10 @@ package com.fit.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
-import com.fit.config.Configuration;
 import com.fit.loader.tree.ClassCondition;
 import com.fit.loader.tree.Search;
 import com.fit.object.Node;
@@ -41,6 +42,16 @@ public class Utils {
 		}
 		reader.close();
 		return fileData.toString();
+	}
+
+	public static void writeContentToFile(String content, String filePath) {
+		try {
+			PrintWriter out = new PrintWriter(filePath);
+			out.println(content);
+			out.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static String getParentOfANode(Node node) {
@@ -119,6 +130,7 @@ public class Utils {
 
 	/**
 	 * Lay cau truc DOM cua file xml
+	 * 
 	 * @param path
 	 * @return
 	 */
