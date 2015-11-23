@@ -36,7 +36,7 @@ public class WebConfigParser extends DependenciesGeneration {
 
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.MULTIPLE_CONFIG_JSF1);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
 
 		WebConfigParser parser = new WebConfigParser(projectRootNode);
 

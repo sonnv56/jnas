@@ -1,11 +1,6 @@
-package com.fit.ducanh.test.displayTree;
+package com.fit.process.tostring;
 
-import com.fit.object.ClassNode;
-import com.fit.object.ComponentNode;
-import com.fit.object.JspNode;
 import com.fit.object.Node;
-import com.fit.object.XhtmlNode;
-import com.fit.object.ConfigurationNode;
 
 /**
  * Mot chien thuat bien doi cay sang xau
@@ -33,7 +28,7 @@ public class TreeStrategy implements IToString {
 	}
 
 	private void displayTree(Node n, int level) {
-		if (n == null)
+		if (n == null || n.getPath() == null)
 			return;
 		else {
 			output += genTab(level) + "[" + n.getId() + "]" + n.getNodeName() + "\n";

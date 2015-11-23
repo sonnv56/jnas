@@ -18,7 +18,7 @@ public class DependencyGeneration {
 		CDIProcessor processor = new CDIProcessor();
 		processor.setProjectNode((ProjectNode) projectRootNode);
 
-		processor.process();
+//		processor.process();
 		/** Web service parser here */
 	}
 }

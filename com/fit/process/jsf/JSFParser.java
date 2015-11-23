@@ -41,7 +41,7 @@ public class JSFParser implements IProjectParser {
 
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
 		List<Dependency> dependencies = new JSFParser(projectRootNode).getDependenciesList();
 		for (Dependency dependency : dependencies)
 			System.out.println(dependency.toString());

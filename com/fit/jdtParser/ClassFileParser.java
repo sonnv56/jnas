@@ -29,7 +29,7 @@ import com.fit.util.Utils;
  * @author DucAnh
  *
  */
-public class ClassFileParser extends Object implements IJdtParser {
+public class ClassFileParser implements IJdtParser {
 
 	private List<MethodDeclaration> listMethodDeclaration = new ArrayList<MethodDeclaration>();
 	private List<ImportDeclaration> listImportDeclaration = new ArrayList<ImportDeclaration>();
