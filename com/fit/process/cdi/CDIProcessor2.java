@@ -32,33 +32,19 @@ import com.fit.process.cdi.condition.CDINamedCondition;
 import com.fit.process.cdi.condition.CDIObservesCondition;
 import com.fit.process.cdi.condition.CDIProducesCondition;
 import com.fit.util.Utils;
-/**
- * @author sonnguyen
- * CDI Processor handles Java CDI
- * */
-public class CDIProcessor extends Processor{
+
+public class CDIProcessor2 extends Processor{
 
 	public static void main(String[] args) {
-//		String projectRootPath = "C://Users//son//Downloads//dukes-forest//dukes-forest";
 		String projectRootPath = "C://Users//son//Google Drive//Share//CDITest//dukes-forest";
-//		String projectRootPath = "//Users//sonnguyen//Google Drive//Share//CDITest//dukes-forest";
+//		String projectRootPath = "C://Users//son//Google Drive//Share//CDITest//CIASample";
 		ProjectNode projectNode = ProjectLoader.load(projectRootPath);
-		CDIProcessor processor = new CDIProcessor();
+		CDIProcessor2 processor = new CDIProcessor2();
 		processor.setProjectNode(projectNode);
 
 		processor.process();
-		
 	}
-	/**
-	 * Workflow:
-	 * <ol>
-	 * <li>Search named node (@Named) (injector)</li>
-	 * <li>Find injection point in each named node</li>
-	 * <li>Find injectee</li>
-	 * <li>Update relationship between nodes</li>
-	 * </ol>
-	 * */
-	@Override
+	
 	public void process(){
 		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
 		List<InjectionPoint> points = findInjectionPointsInInjector(namedNodes);
@@ -73,9 +59,6 @@ public class CDIProcessor extends Processor{
 		for (InjectionPoint injectionPoint : points) {
 			Node caller = Utils.findNodeByPath(projectNode, injectionPoint.getInjector());
 			Node callee = Utils.findNodeByPath(projectNode, injectionPoint.getInjectee());
-			System.out.println(callee.getPath());
-			System.out.println(caller.getPath());
-			System.out.println("---------------------------");
 			if(callee != null && caller != null){
 				caller.getCallees().add(callee);
 				callee.getCallers().add(caller);
@@ -84,7 +67,8 @@ public class CDIProcessor extends Processor{
 	}
 	/**
 	 * Find injectee
-	 * @param points injection points 
+	 * @param points injection points
+	 * @return updated injection points 
 	 * */
 	private List<InjectionPoint> updateInjectionPointsWithInjectee(List<InjectionPoint> points) {
 		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
@@ -93,7 +77,7 @@ public class CDIProcessor extends Processor{
 			String statement = injectionPoint.getStatement().toString();
 			int index = statement.indexOf(CDIConst.INJECT_ANNOTATION);
 			if(index!=-1){										//Xac dinh co phai su dung @Injection
-				index = index+CDIConst.INJECT_ANNOTATION.length()+1;
+				index = index + CDIConst.INJECT_ANNOTATION.length()+1;
 				int index2 = statement.indexOf(" ", index);
 				//Lay qualifier
 				String qualifier = statement.substring(index, index2);
@@ -116,16 +100,14 @@ public class CDIProcessor extends Processor{
 					}else{
 						callees = findCalleesInDefaultMethodCase(injectionPoint);
 					}
-					//Khai bao bang bean.xml
 					if(callees.size() == 0){
 						String beanAlternative = findDefaultClassInBeansXML(CDIConst.CDI_ALTERNATIVES_ELEMENT);
-						System.out.println("Bean: "+ beanAlternative);
 					}
 					//Khai bao bang bean.xml
 					if(callees.size() == 0){
 						String beanAlternative = findDefaultClassInBeansXML(CDIConst.CDI_INTERCEPTORS_ELEMENT);
-						System.out.println(beanAlternative);
 					}
+					//Khai bao bang bean.xml
 				}
 				//Xac dinh chinh xac (truong hop co nhieu qualifiers giong nhau)
 				Node node = getExactNode(callees);
@@ -135,12 +117,18 @@ public class CDIProcessor extends Processor{
 		}
 		return result;
 	}
+	/**
+	 * Find callees in default method case (@Inject ...method)
+	 * @param injectionPoint injection point
+	 * @return callees are found by default method
+	 * */
 	private List<Node> findCalleesInDefaultMethodCase(InjectionPoint injectionPoint) {
-		List<Node> callees = new ArrayList<Node>();
 		MethodDeclaration method = (MethodDeclaration) injectionPoint.getStatement();
 		@SuppressWarnings("unchecked")
 		List<SingleVariableDeclaration> parameters = method.parameters();
+		List<Node> callees = new ArrayList<Node>();
 		for (SingleVariableDeclaration p : parameters) {
+			
 			if(p.toString().indexOf(CDIConst.ANNOTATION_PREFIX)==-1){
 				String type = p.getType().toString();
 				callees = Search.searchNode(projectNode, new CDIDefaultCondition(type));
@@ -163,11 +151,9 @@ public class CDIProcessor extends Processor{
 		qualifier = string.substring(index1, index2).trim();
 		return qualifier;
 	}
-
 	/**
 	 * Xu ly truong hop tim chinh xac vi tri cua injectee
 	 * @param qualifiers
-	 * @param node
 	 * */
 	private Node getExactNode(List<Node> qualifiers) {
 		if(qualifiers.size() > 0){
@@ -176,22 +162,36 @@ public class CDIProcessor extends Processor{
 		return new ClassNode();
 	}
 	/**
-	 * Find injection point in named node (injector)
+	 * Tim cac injection point trong injector
 	 * @param namedNodes injector
-	 * @return list of injection points
 	 * */
 	private List<InjectionPoint> findInjectionPointsInInjector(List<Node> namedNodes) {
 		List<InjectionPoint> points = new ArrayList<InjectionPoint>();
 		for (Node node : namedNodes) {
 			ClassFileParser classFileParser = new ClassFileParser(node.getPath());
 			// Kiem tra cac field
-			List<InjectionPoint> fieldPoints = findInjectionInFelds(node, classFileParser);
+			List<InjectionPoint> fieldPoints = findInjectionInFields(node, classFileParser);
 			points.addAll(fieldPoints);
+			
 			// Kiem tra cac method
 			List<InjectionPoint> methodPoints = findInjectionInMethods(node, classFileParser);
 			points.addAll(methodPoints);
 		}
-		System.out.println(points.size());
+		return points;
+	}
+	/**
+	 * Find injection point in named node (injector)
+	 * @param namedNodes injector
+	 * @return list of injection points
+	 * */
+	private List<InjectionPoint> findInjectionInFields(Node node, ClassFileParser classFileParser) {
+		List<InjectionPoint> points = new ArrayList<InjectionPoint>();
+		for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
+			String fieldStr = field.toString().trim();
+			if(fieldStr.indexOf(CDIConst.INJECT_ANNOTATION)!=-1 || fieldStr.indexOf(CDIConst.RESOURCE_ANOTATION)!=-1){
+				points.add(createAInjectionPoint(node, field));
+			}
+		}
 		return points;
 	}
 	/**
@@ -201,41 +201,25 @@ public class CDIProcessor extends Processor{
 	 * @return list injection points
 	 * */
 	private List<InjectionPoint> findInjectionInMethods(Node node, ClassFileParser classFileParser) {
-		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
+		List<InjectionPoint> points = new ArrayList<InjectionPoint>();
 		for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
 			String methodStr = method.toString().trim();
-			if(methodStr.indexOf(CDIConst.INJECT_ANNOTATION)!=-1 || methodStr.indexOf(CDIConst.RESOURCE_ANOTATION)!=-1){	//Theo cach dung @Injection
-				result.add(createAInjectionPoint(node, method));
+			if(methodStr.indexOf(CDIConst.INJECT_ANNOTATION)!= -1 || methodStr.indexOf(CDIConst.RESOURCE_ANOTATION)!= -1){	//Theo cach dung @Injection
+				points.add(createAInjectionPoint(node, method));
 			}else{
-				if(method.toString().trim().indexOf(CDIConst.PRODUCES_ANNOTATION)!=-1){	//Theo cach dung @Produces
+				if(method.toString().trim().indexOf(CDIConst.PRODUCES_ANNOTATION)!=-1){
 					@SuppressWarnings("unchecked")
-					List<SingleVariableDeclaration> parameters = method.parameters();
-					for (SingleVariableDeclaration p : parameters) {			//Kiem tra tung parameters
-						if (p.toString().indexOf(CDIConst.ANNOTATION_PREFIX)==-1) {					//Kiem tra annotation
-							result.add(createAInjectionPoint(node, method));
+					List<SingleVariableDeclaration> parameters = method .parameters();
+					for (SingleVariableDeclaration p : parameters) {
+						if (p.toString().indexOf(CDIConst.ANNOTATION_PREFIX)==-1) {
+							points.add(createAInjectionPoint(node, method));
 							break;
 						}
 					}
 				}
 			}
 		}
-		return result;
-	}
-	/**
-	 * Find injection point in all fields in a node
-	 * @param node
-	 * @param classFileParser
-	 * @return list injection points
-	 * */
-	private List<InjectionPoint> findInjectionInFelds(Node node, ClassFileParser classFileParser) {
-		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
-		for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
-			String fieldStr = field.toString().trim();
-			if(fieldStr.indexOf(CDIConst.INJECT_ANNOTATION)!=-1 || fieldStr.indexOf(CDIConst.RESOURCE_ANOTATION)!=-1){
-				result.add(createAInjectionPoint(node, field));
-			}
-		}
-		return result;
+		return points;
 	}
 	/**
 	 * Create a new injection point
@@ -253,7 +237,7 @@ public class CDIProcessor extends Processor{
 	 * Find default class in beans.xml
 	 * @return package
 	 * */
-	private String findDefaultClassInBeansXML(String annotation){
+	private String findDefaultClassInBeansXML(String element){
 		String cls = "";
 		List<Node> list = Search.searchNode(projectNode, new CDIBeanCondition());
 		if(list.size() > 0){
@@ -263,8 +247,9 @@ public class CDIProcessor extends Processor{
 			try {
 				dBuilder = dbFactory.newDocumentBuilder();
 				Document doc = dBuilder.parse(bean);
+				
 				doc.getDocumentElement().normalize();
-				NodeList nList = doc.getElementsByTagName(CDIConst.CDI_ALTERNATIVES_ELEMENT);
+				NodeList nList = doc.getElementsByTagName(element);
 				for (int temp = 0; temp < nList.getLength(); temp++) {
 					org.w3c.dom.Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
