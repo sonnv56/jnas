@@ -24,6 +24,7 @@ import com.fit.object.ClassNode;
 import com.fit.object.InjectionPoint;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
+import com.fit.process.Processor;
 import com.fit.process.cdi.condition.CDIBeanCondition;
 import com.fit.process.cdi.condition.CDICustomQualifierCondition;
 import com.fit.process.cdi.condition.CDIDefaultCondition;
@@ -35,9 +36,7 @@ import com.fit.util.Utils;
  * @author sonnguyen
  * CDI Processor handles Java CDI
  * */
-public class CDIProcessor {
-	/** Node project */
-	private ProjectNode projectNode;
+public class CDIProcessor extends Processor{
 
 	public static void main(String[] args) {
 //		String projectRootPath = "C://Users//son//Downloads//dukes-forest//dukes-forest";
@@ -59,6 +58,7 @@ public class CDIProcessor {
 	 * <li>Update relationship between nodes</li>
 	 * </ol>
 	 * */
+	@Override
 	public void process(){
 		List<Node> namedNodes = Search.searchNode(projectNode, new CDINamedCondition());
 		List<InjectionPoint> points = findInjectionPointsInInjector(namedNodes);
@@ -114,11 +114,16 @@ public class CDIProcessor {
 					}else{
 						callees = findCalleesInDefaultMethodCase(injectionPoint);
 					}
+					//Khai bao bang bean.xml
 					if(callees.size() == 0){
-						String beanAlternative = findDefaultClassInBeansXML();
+						String beanAlternative = findDefaultClassInBeansXML(CDIConst.CDI_ALTERNATIVES_ELEMENT);
 						System.out.println(beanAlternative);
 					}
 					//Khai bao bang bean.xml
+					if(callees.size() == 0){
+						String beanAlternative = findDefaultClassInBeansXML(CDIConst.CDI_INTERCEPTORS_ELEMENT);
+						System.out.println(beanAlternative);
+					}
 				}
 				//Xac dinh chinh xac (truong hop co nhieu qualifiers giong nhau)
 				Node node = getExactNode(callees);
@@ -196,7 +201,8 @@ public class CDIProcessor {
 	private List<InjectionPoint> findInjectionInMethods(Node node, ClassFileParser classFileParser) {
 		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
 		for (MethodDeclaration method : classFileParser .getListMethodDeclaration()) {
-			if(method.toString().trim().indexOf(CDIConst.INJECT_ANNOTATION)!=-1 ){	//Theo cach dung @Injection
+			String methodStr = method.toString().trim();
+			if(methodStr.indexOf(CDIConst.INJECT_ANNOTATION)!=-1 || methodStr.indexOf(CDIConst.RESOURCE_ANOTATION)!=-1){	//Theo cach dung @Injection
 				result.add(createAInjectionPoint(node, method));
 			}else{
 				if(method.toString().trim().indexOf(CDIConst.PRODUCES_ANNOTATION)!=-1){	//Theo cach dung @Produces
@@ -222,7 +228,8 @@ public class CDIProcessor {
 	private List<InjectionPoint> findInjectionInFelds(Node node, ClassFileParser classFileParser) {
 		List<InjectionPoint> result = new ArrayList<InjectionPoint>();
 		for (FieldDeclaration field : classFileParser.getListFieldDeclaration()) {
-			if(field.toString().trim().indexOf(CDIConst.INJECT_ANNOTATION)!=-1){
+			String fieldStr = field.toString().trim();
+			if(fieldStr.indexOf(CDIConst.INJECT_ANNOTATION)!=-1 || fieldStr.indexOf(CDIConst.RESOURCE_ANOTATION)!=-1){
 				result.add(createAInjectionPoint(node, field));
 			}
 		}
@@ -240,18 +247,11 @@ public class CDIProcessor {
 		point.setStatement(trim);
 		return point;
 	}
-
-	public void setProjectNode(ProjectNode projectNode) {
-		this.projectNode = projectNode;
-	}
-	public ProjectNode getProjectNode() {
-		return projectNode;
-	}
 	/**
 	 * Find default class in beans.xml
 	 * @return package
 	 * */
-	private String findDefaultClassInBeansXML(){
+	private String findDefaultClassInBeansXML(String annotation){
 		String cls = "";
 		List<Node> list = Search.searchNode(projectNode, new CDIBeanCondition());
 		if(list.size() > 0){
@@ -263,7 +263,7 @@ public class CDIProcessor {
 				Document doc = dBuilder.parse(bean);
 				
 				doc.getDocumentElement().normalize();
-				NodeList nList = doc.getElementsByTagName(CDIConst.CDI_ALTERNATIVES);
+				NodeList nList = doc.getElementsByTagName(annotation);
 				for (int temp = 0; temp < nList.getLength(); temp++) {
 					org.w3c.dom.Node nNode = nList.item(temp);
 					if (nNode.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {

@@ -16,6 +16,8 @@ public interface CDIConst {
 	/**Anotation Named*/
 	public String QUALIFIER_ANOTATION = "@Qualifier";
 	public String INTERFACE_ANOTATION = "@interface";
-	public String CDI_ALTERNATIVES = "alternatives";
+	public String RESOURCE_ANOTATION = "@Resource";
+	public String CDI_ALTERNATIVES_ELEMENT = "alternatives";
+	public String CDI_INTERCEPTORS_ELEMENT = "interceptors";
 
 }
