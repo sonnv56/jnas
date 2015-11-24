@@ -125,7 +125,7 @@ public class ProjectLoader {
 		String[] names = file.list();
 
 		for (String name : names) {
-			pathOfChildren.add(path + "\\" + name);
+			pathOfChildren.add(path + File.separator + name);
 		}
 
 		return pathOfChildren;

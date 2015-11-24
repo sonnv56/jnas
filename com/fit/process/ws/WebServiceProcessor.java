@@ -1,5 +1,6 @@
 package com.fit.process.ws;
 
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
@@ -20,6 +21,10 @@ import com.fit.util.Utils;
 
 public class WebServiceProcessor {
 	private ProjectNode root;
+	private Hashtable<Node, WebServiceInfo> wsiMap;
+	private Hashtable<Node, WebServiceClientInfo> wsciMap;
+
+	
 	
 	private static class Helper {
 		private static String getValueOf(NormalAnnotation na, String name) {
@@ -34,8 +39,34 @@ public class WebServiceProcessor {
 		}
 	}
 	
+	private class WebServiceInfo {
+		String name;
+		String targetNamespace;
+		
+		public WebServiceInfo(String name, String targetNamespace) {
+			this.name = name;
+			this.targetNamespace = targetNamespace;
+		}
+	}
+	
+	private class WebServiceClientInfo {
+		String name;
+		String targetNamespace;
+		String wsdlLocation;
+		
+		public WebServiceClientInfo(String name, String targetNamespace, String wsdlLocation) {
+			this.name = name;
+			this.targetNamespace = targetNamespace;
+			this.wsdlLocation = wsdlLocation;
+		}
+		
+
+	}
+	
 	public WebServiceProcessor(ProjectNode node) {
 		root = node;
+		wsiMap = new Hashtable<>();
+		wsciMap = new Hashtable<>();
 	}
 
 	public static void main(String[] args) {
@@ -49,19 +80,10 @@ public class WebServiceProcessor {
 	public void process() {
 		List<Node> wsClients = getWebServiceClients();
 		List<Node> ws = getWebServices();
-		List<Node> wsdlNodes = Search.searchNode(root, new Condition() {
-			@Override
-			public boolean isStatisfiabe(Node n) {
-				return Utils.fileEndsWith(n.getPath(), "wsdl");
-			}
-		});
-		
-		for (Node n: wsdlNodes) {
-			System.out.println(n.getPath());
-		}
 	}
 
 	private List<Node> getWebServices() {
+		
 		return Search.searchNode(root, new Condition() {
 			@Override
 			public boolean isStatisfiabe(Node n) {
@@ -73,13 +95,17 @@ public class WebServiceProcessor {
 				for (ASTNode a: annotations) {
 					if (a instanceof NormalAnnotation) {
 						NormalAnnotation na = (NormalAnnotation) a;
-						
 						if (na.getTypeName().getFullyQualifiedName().equals("WebService")) {
-							System.out.println(na);
-							String target = Helper.getValueOf(na, "targetNamespace");
-							System.out.println(target);
-							
-							return true;
+							if (n.getPath().contains("build/generated")) {
+								if (n.getPath().contains("build/generated/")) {
+									System.out.println(na);
+									String target = Helper.getValueOf(na, "targetNamespace");
+									String name = Helper.getValueOf(na, "name");
+									
+									wsiMap.put(n, new WebServiceInfo(name, target));
+								}
+							} else
+								return true;
 						}
 					}
 
@@ -102,10 +128,17 @@ public class WebServiceProcessor {
 					if (a instanceof NormalAnnotation) {
 						NormalAnnotation na = (NormalAnnotation) a;
 						if (na.getTypeName().getFullyQualifiedName().equals("WebServiceRef")) {
-							String value = Helper.getValueOf(na, "wsdlLocation");
-							System.out.println(value);
-							
-							return true;							
+							System.out.println(na);							
+							return true;
+						} else if (na.getTypeName().getFullyQualifiedName().equals("WebServiceClient")) {
+							if (n.getPath().contains("build/generated/")) {
+								System.out.println(na);
+								String wsdlLocation = Helper.getValueOf(na, "wsdlLocation");
+								String name = Helper.getValueOf(na, "name");
+								String target = Helper.getValueOf(na, "targetNamespace");
+								
+								wsciMap.put(n, new WebServiceClientInfo(name, target, wsdlLocation));
+							}
 						}
 					}
 
