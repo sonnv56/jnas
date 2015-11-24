@@ -11,8 +11,8 @@ import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 
 /**
- * Bien doi cay cau truc vat li sang cay cau truc don gian hon: cac file ma
- * nguon duoc tap trung trong cac package.
+ * Bien doi cay cau truc vat li sang cay cau truc don gian hon: cac file java
+ * duoc tap trung trong cac package.
  * <p style="color: red">
  * Note: Chua sao chep cay cau truc vat li truoc khi reduce (nguyen nhan: cay
  * goc se bi mat du lieu)
@@ -21,21 +21,21 @@ import com.fit.object.ProjectNode;
  * @author DucAnh
  *
  */
-public class TreeReducer implements ITreeReducer {
+public class TreeReducerforClass implements ITreeReducer {
 	private Node root_;
 
 	public static void main(String[] args) {
 		// Project tree generation
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
-		new TreeReducer(projectRootNode);
+		new TreeReducerforClass(projectRootNode);
 		// display tree of project
 		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);
 		System.out.println(treeDisplayer.getString());
 
 	}
 
-	public TreeReducer(Node root) {
+	public TreeReducerforClass(Node root) {
 		root_ = root;
 		reduce();
 	}

@@ -20,10 +20,10 @@ import com.fit.process.jsf.object.NavigationRuleTag;
  *
  */
 public class NavigationRuleParser extends DependenciesGeneration {
-	NavigationRuleTag navigationRule_;
-	List<Node> webPages_;
-	List<MbNodeContainer> mbNodeContainers_;
-	Node projectNode;
+	private NavigationRuleTag navigationRule_;
+	private List<Node> webPages_;
+	private List<MbNodeContainer> mbNodeContainers_;
+	private Node projectNode;
 
 	public NavigationRuleParser(NavigationRuleTag navigationRule, Node projectNode, List<Node> webPagesList,
 			List<MbNodeContainer> managedBeansList) {
