@@ -8,6 +8,7 @@ import com.fit.process.cdi.CDIProcessor;
 import com.fit.process.jsf.JSFParser;
 import com.fit.process.jsf.TreeUpdater;
 import com.fit.process.jsf.object.Dependency;
+import com.fit.process.ws.WebServiceProcessor;
 
 public class DependencyGeneration {
 	public static void parse(Node projectRootNode) {
@@ -20,5 +21,8 @@ public class DependencyGeneration {
 
 //		processor.process();
 		/** Web service parser here */
+		
+		WebServiceProcessor wsp = new WebServiceProcessor((ProjectNode) projectRootNode);
+		wsp.process();
 	}
 }

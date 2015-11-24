@@ -16,7 +16,8 @@ import com.fit.process.tostring.JsonStrategy;
 public class Preprocess {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
+		ProjectNode projectRootNode = ProjectLoader.load("/home/rmrf/builds/dukes-forest");
+//		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
 
 		// create dependency between nodes in structure tree here (do later)
 		DependencyGeneration.parse(projectRootNode);

@@ -1,5 +1,6 @@
 package com.fit.process.ws;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -23,19 +24,24 @@ public class WebServiceProcessor {
 	private ProjectNode root;
 	private Hashtable<Node, WebServiceInfo> wsiMap;
 	private Hashtable<Node, WebServiceClientInfo> wsciMap;
+	private Hashtable<Node, WebServiceClientInfo> wscriMap;
 
-	
-	
 	private static class Helper {
 		private static String getValueOf(NormalAnnotation na, String name) {
 			for (Object p: na.values()) {
 				MemberValuePair pair = (MemberValuePair) p;
 				if (pair.getName().getFullyQualifiedName().equals(name)) {
-					return pair.getValue().toString();
+					String valueWithQuote = pair.getValue().toString();
+					return valueWithQuote.substring(1, valueWithQuote.length() - 1);
 				}
 			}
 			
 			return "";
+		}
+		
+		private static String getNodeClassName(Node n) {
+			String name = n.getNodeName();
+			return name.substring(0, name.lastIndexOf('.'));
 		}
 	}
 	
@@ -46,6 +52,10 @@ public class WebServiceProcessor {
 		public WebServiceInfo(String name, String targetNamespace) {
 			this.name = name;
 			this.targetNamespace = targetNamespace;
+		}
+		
+		public boolean match(WebServiceClientInfo clientInfo) {
+			return this.name.equals(clientInfo.getServiceName()) && this.targetNamespace.equals(clientInfo.targetNamespace);
 		}
 	}
 	
@@ -60,13 +70,21 @@ public class WebServiceProcessor {
 			this.wsdlLocation = wsdlLocation;
 		}
 		
+		public String getServiceName() {
+			return name.substring(0, name.lastIndexOf("Service"));
+		}
 
+		@Override
+		public String toString() {
+			return String.format("%s(%s,%s,%s)", this.getClass().getSimpleName(), name, targetNamespace, wsdlLocation);
+		}
 	}
 	
 	public WebServiceProcessor(ProjectNode node) {
 		root = node;
 		wsiMap = new Hashtable<>();
 		wsciMap = new Hashtable<>();
+		wscriMap = new Hashtable<>();
 	}
 
 	public static void main(String[] args) {
@@ -77,13 +95,56 @@ public class WebServiceProcessor {
 		wsp.process();
 	}
 	
+	private void mapClientNode() {
+		Enumeration<Node> nKeys = wscriMap.keys();
+		while (nKeys.hasMoreElements()) {
+			Node nInfo = nKeys.nextElement();
+			WebServiceClientInfo ref = wscriMap.get(nInfo);
+			
+			Enumeration<Node> mKeys = wsciMap.keys();
+			while (mKeys.hasMoreElements()) {
+				Node mInfo = mKeys.nextElement();
+				WebServiceClientInfo client = wsciMap.get(mInfo);
+
+				if (ref.wsdlLocation.equals(client.wsdlLocation)) {
+					ref.name = client.name;
+					ref.targetNamespace = client.targetNamespace;
+				}
+			}
+			
+		}
+		
+	}
+	
+	
 	public void process() {
 		List<Node> wsClients = getWebServiceClients();
+		
+		mapClientNode();
+		
 		List<Node> ws = getWebServices();
+		
+		Enumeration<Node> serviceNodes = wsiMap.keys();
+		
+		while (serviceNodes.hasMoreElements()) {
+			Node snode = serviceNodes.nextElement();
+			WebServiceInfo wsi = wsiMap.get(snode);
+			
+			Enumeration<Node> clientNodes = wscriMap.keys();
+			while (clientNodes.hasMoreElements()) {
+				Node cnode = clientNodes.nextElement();
+				WebServiceClientInfo wsci = wscriMap.get(cnode);
+				
+				if (wsi.match(wsci)) {
+					snode.getCallers().add(cnode);
+					cnode.getCallees().add(snode);
+				}
+				
+			}
+		}
 	}
 
 	private List<Node> getWebServices() {
-		
 		return Search.searchNode(root, new Condition() {
 			@Override
 			public boolean isStatisfiabe(Node n) {
@@ -96,16 +157,17 @@ public class WebServiceProcessor {
 					if (a instanceof NormalAnnotation) {
 						NormalAnnotation na = (NormalAnnotation) a;
 						if (na.getTypeName().getFullyQualifiedName().equals("WebService")) {
-							if (n.getPath().contains("build/generated")) {
-								if (n.getPath().contains("build/generated/")) {
-									System.out.println(na);
-									String target = Helper.getValueOf(na, "targetNamespace");
-									String name = Helper.getValueOf(na, "name");
-									
-									wsiMap.put(n, new WebServiceInfo(name, target));
+							if (!n.getPath().contains("build/generated")) {
+								String target = Helper.getValueOf(na, "targetNamespace");
+								String name = Helper.getValueOf(na, "name");
+								
+								if (name.isEmpty()) {
+									name = Helper.getNodeClassName(n);
 								}
-							} else
+								
+								wsiMap.put(n, new WebServiceInfo(name, target));
 								return true;
+							}
 						}
 					}
 
@@ -128,11 +190,14 @@ public class WebServiceProcessor {
 					if (a instanceof NormalAnnotation) {
 						NormalAnnotation na = (NormalAnnotation) a;
 						if (na.getTypeName().getFullyQualifiedName().equals("WebServiceRef")) {
-							System.out.println(na);							
+							String wsdlLocation = Helper.getValueOf(na, "wsdlLocation");
+							String name = Helper.getValueOf(na, "name");
+							String target = Helper.getValueOf(na, "targetNamespace");
+							
+							wscriMap.put(n, new WebServiceClientInfo(name, target, wsdlLocation));
 							return true;
 						} else if (na.getTypeName().getFullyQualifiedName().equals("WebServiceClient")) {
 							if (n.getPath().contains("build/generated/")) {
-								System.out.println(na);
 								String wsdlLocation = Helper.getValueOf(na, "wsdlLocation");
 								String name = Helper.getValueOf(na, "name");
 								String target = Helper.getValueOf(na, "targetNamespace");
