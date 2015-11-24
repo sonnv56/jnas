@@ -16,14 +16,14 @@ import com.fit.process.tostring.JsonStrategyForHung;
 public class Preprocess {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load("/home/rmrf/builds/dukes-forest");
-//		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
+//		ProjectNode projectRootNode = ProjectLoader.load("/home/rmrf/builds/dukes-forest");
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
 		// create dependency between nodes in structure tree here (do later)
 		DependencyGeneration.parse(projectRootNode);
 		
-		IToString displayer = new JsonStrategyForHung(projectRootNode);
-		System.out.println(displayer.getString());
+//		IToString displayer = new JsonStrategyForHung(projectRootNode);
+//		System.out.println(displayer.getString());
 
 		// Lay tat ca cac node la
 		// List<Node> leafList = Search.searchNode(projectRootNode, new

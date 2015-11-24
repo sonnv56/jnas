@@ -1,5 +1,6 @@
 package com.fit.process.ws;
 
+import java.io.File;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -157,7 +158,8 @@ public class WebServiceProcessor {
 					if (a instanceof NormalAnnotation) {
 						NormalAnnotation na = (NormalAnnotation) a;
 						if (na.getTypeName().getFullyQualifiedName().equals("WebService")) {
-							if (!n.getPath().contains("build/generated")) {
+							System.out.println(n.getPath());
+							if (!n.getPath().contains("build" + File.separator + "generated")) {
 								String target = Helper.getValueOf(na, "targetNamespace");
 								String name = Helper.getValueOf(na, "name");
 								
@@ -197,7 +199,7 @@ public class WebServiceProcessor {
 							wscriMap.put(n, new WebServiceClientInfo(name, target, wsdlLocation));
 							return true;
 						} else if (na.getTypeName().getFullyQualifiedName().equals("WebServiceClient")) {
-							if (n.getPath().contains("build/generated/")) {
+							if (n.getPath().contains("build" + File.separator + "generated" + File.separator)) {
 								String wsdlLocation = Helper.getValueOf(na, "wsdlLocation");
 								String name = Helper.getValueOf(na, "name");
 								String target = Helper.getValueOf(na, "targetNamespace");
