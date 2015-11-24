@@ -10,7 +10,7 @@ import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 import com.fit.process.DependencyGeneration;
 import com.fit.process.tostring.IToString;
-import com.fit.process.tostring.JsonStrategy;
+import com.fit.process.tostring.JsonStrategyForHung;
 import com.fit.util.Utils;
 
 /**
@@ -32,7 +32,7 @@ public class WaveAlgorithm implements IComputeImpactSet {
 		DependencyGeneration.parse(projectRootNode);
 
 		// Xuat cay cau truc sang JSON
-		IToString displayer = new JsonStrategy(projectRootNode);
+		IToString displayer = new JsonStrategyForHung(projectRootNode);
 		Utils.writeContentToFile(displayer.getString(), ConfigurationOfAnh.JSON_DUKES_FOREST_PATH);
 
 		// Phan tich JSON xay dung tree

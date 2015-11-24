@@ -15,7 +15,7 @@ import com.fit.object.Node;
  * @author Duc Anh
  *
  */
-public class JsonStrategy implements IToString {
+public class JsonStrategyForHung implements IToString {
 	private String output_ = "";
 	private Node node_;
 
@@ -24,7 +24,7 @@ public class JsonStrategy implements IToString {
 	 * @param node
 	 *            root cua project
 	 */
-	public JsonStrategy(Node node) {
+	public JsonStrategyForHung(Node node) {
 		this.node_ = node;
 		convertToString();
 	}
