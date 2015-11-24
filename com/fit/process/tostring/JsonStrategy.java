@@ -9,7 +9,8 @@ import com.fit.loader.tree.Search;
 import com.fit.object.Node;
 
 /**
- * Xuat cay cau truc sang dang JSON
+ * Xuat cay cau truc sang dang JSON gom hai thanh phan: danh sach files va danh
+ * sach quan he phu thuoc
  * 
  * @author Duc Anh
  *
@@ -76,7 +77,6 @@ public class JsonStrategy implements IToString {
 
 	@Override
 	public String getString() {
-		// TODO Auto-generated method stub
 		return output_;
 	}
 }

@@ -10,27 +10,34 @@ import com.fit.object.ComponentNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
 
+/**
+ * Bien doi cay cau truc vat li sang cay cau truc don gian hon: cac file ma
+ * nguon duoc tap trung trong cac package.
+ * <p style="color: red">
+ * Note: Chua sao chep cay cau truc vat li truoc khi reduce (nguyen nhan: cay
+ * goc se bi mat du lieu)
+ * </p>
+ * 
+ * @author DucAnh
+ *
+ */
 public class TreeReducer implements ITreeReducer {
 	private Node root_;
-	/** fsdfs */
-	private List<ComponentNode> packageNodes = new ArrayList<>();
 
 	public static void main(String[] args) {
 		// Project tree generation
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
-		TreeReducer reducer = new TreeReducer(projectRootNode);
+		new TreeReducer(projectRootNode);
 		// display tree of project
 		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);
-		 System.out.println(treeDisplayer.getString());
+		System.out.println(treeDisplayer.getString());
 
 	}
 
 	public TreeReducer(Node root) {
 		root_ = root;
 		reduce();
-
-		// removeUnnecessaryNode(root);
 	}
 
 	@Override
@@ -38,6 +45,12 @@ public class TreeReducer implements ITreeReducer {
 		traverse(root_);
 	}
 
+	/**
+	 * Kiem tra Node n co phai node root dung de luu cac file .java khong
+	 * 
+	 * @param n
+	 * @return
+	 */
 	private boolean isStartOfPackage(Node n) {
 		final String[] PACKAGE_SYMBOL = new String[] { "src", "generated-sources", "generated" };
 		for (String packageSymbol : PACKAGE_SYMBOL)
@@ -46,14 +59,19 @@ public class TreeReducer implements ITreeReducer {
 		return false;
 	}
 
+	/**
+	 * Duyet cac node
+	 * 
+	 * @param n
+	 */
 	private void traverse(Node n) {
 		for (Node child : n.getChildren()) {
 			if (child instanceof ComponentNode && isStartOfPackage(child)) {
 				Node src = child;
 				List<Node> packageNodes = new ArrayList<Node>();
-				
+
 				traverseSrc(child, src, packageNodes);
-				
+
 				src.getChildren().clear();
 				src.getChildren().addAll(packageNodes);
 			} else {
@@ -62,6 +80,13 @@ public class TreeReducer implements ITreeReducer {
 		}
 	}
 
+	/**
+	 * Lay ten package
+	 * 
+	 * @param n
+	 * @param src
+	 * @return
+	 */
 	private String getRelativePath(Node n, Node src) {
 		String rootPath = src.getPath();
 
@@ -73,6 +98,13 @@ public class TreeReducer implements ITreeReducer {
 		return relativePath;
 	}
 
+	/**
+	 * Duyet cac cay con
+	 * 
+	 * @param n
+	 * @param src
+	 * @param packageNodes
+	 */
 	private void traverseSrc(Node n, Node src, List<Node> packageNodes) {
 		for (Node child : n.getChildren()) {
 
@@ -89,7 +121,6 @@ public class TreeReducer implements ITreeReducer {
 				packageNode.addChild(child);
 				child.setParent(packageNode);
 
-				
 			} else
 				traverseSrc(child, src, packageNodes);
 		}
