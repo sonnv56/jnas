@@ -9,8 +9,16 @@ import com.fit.cia.LeafCondition;
 import com.fit.ducanh.test.ConfigurationOfAnh;
 import com.fit.loader.ProjectLoader;
 import com.fit.loader.tree.Search;
+import com.fit.object.ClassNode;
+import com.fit.object.ComponentNode;
+import com.fit.object.ConfigurationNode;
+import com.fit.object.CssNode;
+import com.fit.object.JavascriptNode;
+import com.fit.object.JspNode;
+import com.fit.object.ManagedBeanNode;
 import com.fit.object.Node;
 import com.fit.object.ProjectNode;
+import com.fit.object.XhtmlNode;
 import com.fit.process.DependencyGeneration;
 
 /**
@@ -52,7 +60,23 @@ public class JsonStrategyForDGraph implements IToString {
 			if (file.getCallees().size() > 0 || file.getCallers().size() > 0) {
 				JSONObject obj = new JSONObject();
 				obj.put("name", file.getNodeName() + "[" + file.getId() + "]");
-				obj.put("type", "group0");
+
+				if (file instanceof ClassNode)
+					obj.put("type", "class");
+				else if (file instanceof ConfigurationNode)
+					obj.put("type", "configuration");
+				else if (file instanceof XhtmlNode)
+					obj.put("type", "xhtml");
+				else if (file instanceof JspNode)
+					obj.put("type", "jsp");
+				else if (file instanceof CssNode)
+					obj.put("type", "css");
+				else if (file instanceof JavascriptNode)
+					obj.put("type", "javascript");
+				else if (file instanceof ManagedBeanNode)
+					obj.put("type", "managedbean");
+				else if (file instanceof ComponentNode)
+					obj.put("type", "folder");
 
 				JSONArray depends = new JSONArray();
 				for (Node callee : file.getCallees())
