@@ -41,10 +41,10 @@ public class JSFParser implements IProjectParser {
 
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 		List<Dependency> dependencies = new JSFParser(projectRootNode).getDependenciesList();
 		for (Dependency dependency : dependencies)
-			System.out.println(dependency.toString());
+			System.out.println(dependency.toString().replace(projectRootNode.getPath() + "\\", ""));
 	}
 
 	public JSFParser(Node projectRootNode) {
@@ -58,17 +58,18 @@ public class JSFParser implements IProjectParser {
 
 		for (Node projectNode : projectNodes)
 			if (useJsfTechnology(projectNode)) {
+//				System.out.println(projectNode.getPath());
 				/** Tim va phan tich web.xml */
 				final WebConfigParser webConfigParser = new WebConfigParser(projectNode);
 				final List<Node> jsfConfigNodes = webConfigParser.getListConfigJSFNode();
 				final List<Dependency> dependencies = webConfigParser.getDependencies();
-				
+
 				ParamaterWebConfig.URL_PATTERN = webConfigParser.getUriPattern();
 				dependencies_.addAll(dependencies);
 
 				/** Lay danh sach managed bean duoc dinh nghia trong file */
 				List<MbNodeContainer> mbNodes = new CollectMbFromJavaFile(projectNode).getMbNodes();
-
+				//System.out.println(mbNodes.toString());
 				/** Luu tat ca cac node managed bean trong config */
 				for (Node jsfConfigNode : jsfConfigNodes) {
 					final List<ManagedBeanTag> mbTags = getManagedBeanTagList(jsfConfigNode);
@@ -105,6 +106,7 @@ public class JSFParser implements IProjectParser {
 					final List<Dependency> dependencies2 = xhtmlWebPageParser.getDependencies();
 					dependencies_.addAll(dependencies2);
 				}
+				int x = 1;
 			}
 	}
 

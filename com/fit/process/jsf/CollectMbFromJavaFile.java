@@ -71,15 +71,16 @@ public class CollectMbFromJavaFile {
 		for (ASTNode m : classParser.getListAnnotation()) {
 			String managedBeanAnnotation = m.toString();
 
-			if (m.toString().contains(MANAGED_BEAN_ANNOTATION)) {
-				managedName = parseMbAnnotation(managedBeanAnnotation);
-				
-				/** managed bean file khong dinh nghia ten */
-				if (managedName.length() == 0) {
-					managedName = managedNode.getNodeName().replace(".java", "");
+			for (String mbAnnotation : MANAGED_BEAN_ANNOTATIONS)
+				if (m.toString().contains(mbAnnotation)) {
+					managedName = parseMbAnnotation(managedBeanAnnotation);
+
+					/** managed bean file khong dinh nghia ten */
+					if (managedName.length() == 0) {
+						managedName = managedNode.getNodeName().replace(".java", "");
+					}
+					break;
 				}
-				break;
-			}
 		}
 
 		return managedName;
@@ -94,16 +95,20 @@ public class CollectMbFromJavaFile {
 	 */
 	private String parseMbAnnotation(String mbAnnotation) {
 		String managedName = "";
+		for (String mbDeclaration : MANAGED_BEAN_NAME_DECLARATION_EXPRESSIONS) {
+			Pattern p = Pattern.compile(mbDeclaration);
+			Matcher m = p.matcher(mbAnnotation);
 
-		Pattern p = Pattern.compile(MANAGED_BEAN_NAME_DECLARATION_EXPRESSION);
-		Matcher m = p.matcher(mbAnnotation);
-
-		if (m.find()) {
-			managedName = m.group(1);
+			if (m.find()) {
+				managedName = m.group(1);
+			}
+			if (managedName.length() > 0)
+				break;
 		}
 		return managedName;
 	}
 
-	private static final String MANAGED_BEAN_ANNOTATION = "@ManagedBean";
-	private static final String MANAGED_BEAN_NAME_DECLARATION_EXPRESSION = "name\\s*=\\s*\"(\\w+)\"";
+	private static final String[] MANAGED_BEAN_ANNOTATIONS = new String[] { "@ManagedBean(", "@Named(", "@Named\n" };
+	private static final String[] MANAGED_BEAN_NAME_DECLARATION_EXPRESSIONS = new String[] { "name\\s*=\\s*\"(\\w+)\"",
+			"value\\s*=\\s*\"(\\w+)\"", "\\(\\\"(\\w+)\\\"\\)" };
 }

@@ -14,7 +14,7 @@ import com.fit.util.Utils;
 
 /**
  * Phan tich web .xhtml de lay su phu thuoc (.xhtml page, CSS file), (.xhtml
- * page, MB file)
+ * page, MB file), (.xhtml, template file)
  * 
  * @author DucAnh
  *
@@ -60,6 +60,7 @@ public class XhtmlPageParser extends DependenciesGeneration {
 					output.add(d);
 				}
 			}
+			/** Tim su phu thuoc web page va template file */
 		} catch (Exception e) {
 
 		}
