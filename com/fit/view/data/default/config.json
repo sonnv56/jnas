@@ -1,0 +1,54 @@
+{
+    "title" : "Project's dependency",
+    "graph" : {
+        "linkDistance" : 100,
+        "charge"       : -400,
+        "height"       : 1500,
+        "numColors"    : 12,
+        "labelPadding" : {
+            "left"   : 3,
+            "right"  : 3,
+            "top"    : 2,
+            "bottom" : 2
+        },
+        "labelMargin" : {
+            "left"   : 3,
+            "right"  : 3,
+            "top"    : 2,
+            "bottom" : 2
+        },
+        "ticksWithoutCollisions" : 50
+    },
+    "types" : {
+        "class" : {
+            "short" : "class",
+            "long"  : "Class file"
+        },
+        "xhtml" : {
+            "short" : "xhtml",
+            "long": "XHTML file"
+        },
+        "configuration" : {
+            "short" : "configuration",
+            "long" : "configuration file"
+        }
+    },
+    "constraints" : [
+        {
+            "has"    : { "type" : "class" },
+            "type"   : "position",
+            "y"      : 0.1,
+            "weight" : 0.8
+        }, {
+            "has"    : { "type" : "xhtml" },
+            "type"   : "position",
+            "y"      : 0.2,
+            "weight" : 0.8
+        }, {
+            "has"    : { "type" : "configuration" },
+            "type"   : "position",
+            "y"      : 0.5,
+            "weight" : 0.5
+        }
+    ]
+}

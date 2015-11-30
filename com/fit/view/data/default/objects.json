@@ -1,0 +1,125 @@
+[{
+	"name": "Payment.java[33]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "UserController.java[155]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "index.xhtml[160]",
+	"depends": [],
+	"type": "xhtml"
+}, {
+	"name": "index.xhtml[161]",
+	"depends": [],
+	"type": "xhtml"
+}, {
+	"name": "faces-config.xml[168]",
+	"depends": [],
+	"type": "configuration"
+}, {
+	"name": "web.xml[170]",
+	"depends": ["faces-config.xml[168]", "index.xhtml[160]", "index.xhtml[161]"],
+	"type": "configuration"
+}, {
+	"name": "EventDispatcherBean.java[318]",
+	"depends": ["PaymentHandler.java[344]"],
+	"type": "class"
+}, {
+	"name": "ShoppingCart.java[324]",
+	"depends": ["UserController.java[155]"],
+	"type": "class"
+}, {
+	"name": "PaymentHandler.java[344]",
+	"depends": ["Payment.java[33]"],
+	"type": "class"
+}, {
+	"name": "CategoryController.java[351]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "CustomerController.java[352]",
+	"depends": ["UserController.java[155]"],
+	"type": "class"
+}, {
+	"name": "CustomerOrderController.java[353]",
+	"depends": ["UserController.java[155]"],
+	"type": "class"
+}, {
+	"name": "Create.xhtml[375]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "Edit.xhtml[376]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "List.xhtml[377]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "View.xhtml[378]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "index.xhtml[390]",
+	"depends": [],
+	"type": "xhtml"
+}, {
+	"name": "Create.xhtml[400]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "Edit.xhtml[401]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "index.xhtml[411]",
+	"depends": [],
+	"type": "xhtml"
+}, {
+	"name": "ListCategory.xhtml[423]",
+	"depends": ["CategoryController.java[351]"],
+	"type": "xhtml"
+}, {
+	"name": "faces-config.xml[430]",
+	"depends": [],
+	"type": "configuration"
+}, {
+	"name": "web.xml[432]",
+	"depends": ["faces-config.xml[430]", "index.xhtml[390]", "index.xhtml[411]"],
+	"type": "configuration"
+}, {
+	"name": "mb1.java[517]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "mb2.java[518]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "mb3.java[519]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "mb4.java[520]",
+	"depends": [],
+	"type": "class"
+}, {
+	"name": "index.xhtml[522]",
+	"depends": ["mb1.java[517]", "mb2.java[518]", "mb3.java[519]", "mb4.java[520]"],
+	"type": "xhtml"
+}, {
+	"name": "faces-config1.xml[524]",
+	"depends": ["mb3.java[519]"],
+	"type": "configuration"
+}, {
+	"name": "faces-config2.xml[525]",
+	"depends": ["mb4.java[520]"],
+	"type": "configuration"
+}, {
+	"name": "web.xml[526]",
+	"depends": ["faces-config1.xml[524]", "faces-config2.xml[525]"],
+	"type": "configuration"
+}]
