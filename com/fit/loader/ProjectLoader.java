@@ -13,6 +13,8 @@ import com.fit.object.ProjectNode;
 import com.fit.object.XhtmlNode;
 import com.fit.process.tostring.TreeStrategy;
 import com.fit.object.ConfigurationNode;
+import com.fit.object.CssNode;
+import com.fit.object.JavascriptNode;
 
 /**
  * Load 1 project
@@ -20,7 +22,7 @@ import com.fit.object.ConfigurationNode;
 public class ProjectLoader {
 	public static void main(String[] args) {
 		// Project tree generation
-		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH2);
+		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
 		// display tree of project
 		TreeStrategy treeDisplayer = new TreeStrategy(projectRootNode);
@@ -43,7 +45,6 @@ public class ProjectLoader {
 	}
 
 	private static void parseSrcFolder(Node parent, String path) {
-
 		ArrayList<String> children = getChildren(path);
 
 		for (String pathItem : children)
@@ -86,6 +87,21 @@ public class ProjectLoader {
 
 				parseSrcFolder(componentNode, pathItem);
 				break;
+
+			case Configuration.CSS_FILE:
+				CssNode cssNode = new CssNode();
+				cssNode.setId(NUMBER_OF_NODES++);
+				cssNode.setPath(pathItem);
+				parent.getChildren().add(cssNode);
+				cssNode.setParent(parent);
+				break;
+			case Configuration.JAVASCRIPT_FILE:
+				JavascriptNode javascriptNode = new JavascriptNode();
+				javascriptNode.setId(NUMBER_OF_NODES++);
+				javascriptNode.setPath(pathItem);
+				parent.getChildren().add(javascriptNode);
+				javascriptNode.setParent(parent);
+				break;
 			}
 	}
 
@@ -96,15 +112,18 @@ public class ProjectLoader {
 	 * @return Kieu doi tuong
 	 */
 	private static int getTypeOfPath(String pathItem) {
-		if (pathItem.contains(CLASS_SYMBOL))
+		if (pathItem.endsWith(CLASS_SYMBOL))
 			return Configuration.CLASS_FILE;
-		if (pathItem.contains(JSP_SYMBOL))
+		if (pathItem.endsWith(JSP_SYMBOL))
 			return Configuration.JSP_FILE;
-		if (pathItem.contains(XHTML_SYMBOL))
+		if (pathItem.endsWith(XHTML_SYMBOL))
 			return Configuration.XHTML_FILE;
-		if (pathItem.contains(XML_SYMBOL))
+		if (pathItem.endsWith(XML_SYMBOL))
 			return Configuration.XML_FILE;
-
+		if (pathItem.endsWith(CSS_SYMBOL))
+			return Configuration.CSS_FILE;
+		if (pathItem.endsWith(JAVASCRIPT_SYMBOL))
+			return Configuration.JAVASCRIPT_FILE;
 		// check whether is folder
 		File file = new File(pathItem);
 		if (file.isDirectory())
@@ -135,6 +154,8 @@ public class ProjectLoader {
 	private static final String XHTML_SYMBOL = ".xhtml";
 	private static final String JSP_SYMBOL = ".jsp";
 	private static final String XML_SYMBOL = ".xml";
+	private static final String CSS_SYMBOL = ".css";
+	private static final String JAVASCRIPT_SYMBOL = ".js";
 
 	private static int NUMBER_OF_NODES = 0;
 }
