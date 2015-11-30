@@ -5,8 +5,10 @@ import com.fit.loader.ProjectLoader;
 import com.fit.object.ProjectNode;
 import com.fit.process.DependencyGeneration;
 import com.fit.process.tostring.IToString;
+import com.fit.process.tostring.JsonStrategyForDGraph;
 import com.fit.process.tostring.JsonStrategyForHung;
 import com.fit.process.tostring.TreeStrategy;
+import com.fit.util.Utils;
 
 /**
  * Ham tien xu li cay chuan bi cho qua trinh xu li CIA
@@ -16,20 +18,20 @@ import com.fit.process.tostring.TreeStrategy;
  */
 public class Preprocess {
 	public static void main(String[] args) {
-		// Project tree generation
-//		ProjectNode projectRootNode = ProjectLoader.load("/home/rmrf/builds/dukes-forest");
+		/** Project tree generation */
+		// ProjectNode projectRootNode =
+		// ProjectLoader.load("/home/rmrf/builds/dukes-forest");
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 
-		// create dependency between nodes in structure tree here (do later)
+		/** create dependency between nodes in structure tree here */
 		DependencyGeneration.parse(projectRootNode);
-		
+
+		/** Display dependency tree */
 		IToString displayer = new TreeStrategy(projectRootNode);
 		System.out.println(displayer.getString());
 
-		// Lay tat ca cac node la
-		// List<Node> leafList = Search.searchNode(projectRootNode, new
-		// LeafCondition());
-		// for (Node n : leafList)
-		// System.out.println(n.getPath());
+		/** Json generation for dependency graph */
+		JsonStrategyForDGraph dGraphJson = new JsonStrategyForDGraph(projectRootNode);
+		Utils.writeContentToFile(dGraphJson.getString(), ConfigurationOfAnh.DEFAULT_JSON_PATH_FOR_DEPENDENCY_GRAPH);
 	}
 }
