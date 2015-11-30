@@ -6,6 +6,7 @@ import com.fit.object.ProjectNode;
 import com.fit.process.DependencyGeneration;
 import com.fit.process.tostring.IToString;
 import com.fit.process.tostring.JsonStrategyForHung;
+import com.fit.process.tostring.TreeStrategy;
 
 /**
  * Ham tien xu li cay chuan bi cho qua trinh xu li CIA
@@ -22,8 +23,8 @@ public class Preprocess {
 		// create dependency between nodes in structure tree here (do later)
 		DependencyGeneration.parse(projectRootNode);
 		
-//		IToString displayer = new JsonStrategyForHung(projectRootNode);
-//		System.out.println(displayer.getString());
+		IToString displayer = new TreeStrategy(projectRootNode);
+		System.out.println(displayer.getString());
 
 		// Lay tat ca cac node la
 		// List<Node> leafList = Search.searchNode(projectRootNode, new
