@@ -44,7 +44,7 @@ public class JSFParser implements IProjectParser {
 		ProjectNode projectRootNode = ProjectLoader.load(ConfigurationOfAnh.JSF_DUKES_FOREST_PATH);
 		List<Dependency> dependencies = new JSFParser(projectRootNode).getDependenciesList();
 		for (Dependency dependency : dependencies)
-			System.out.println(dependency.toString().replace(projectRootNode.getPath() + "\\", ""));
+			System.out.println(dependency.toString());
 	}
 
 	public JSFParser(Node projectRootNode) {

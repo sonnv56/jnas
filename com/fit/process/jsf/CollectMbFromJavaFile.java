@@ -72,12 +72,16 @@ public class CollectMbFromJavaFile {
 			String managedBeanAnnotation = m.toString();
 
 			for (String mbAnnotation : MANAGED_BEAN_ANNOTATIONS)
-				if (m.toString().contains(mbAnnotation)) {
+				if ((m.toString()+"\r").contains(mbAnnotation)) {
 					managedName = parseMbAnnotation(managedBeanAnnotation);
 
 					/** managed bean file khong dinh nghia ten */
 					if (managedName.length() == 0) {
 						managedName = managedNode.getNodeName().replace(".java", "");
+						
+						char c[] = managedName.toCharArray();
+						c[0] = Character.toLowerCase(c[0]);
+						managedName = new String(c);
 					}
 					break;
 				}
@@ -108,7 +112,7 @@ public class CollectMbFromJavaFile {
 		return managedName;
 	}
 
-	private static final String[] MANAGED_BEAN_ANNOTATIONS = new String[] { "@ManagedBean(", "@Named(", "@Named\n" };
+	private static final String[] MANAGED_BEAN_ANNOTATIONS = new String[] { "@ManagedBean(", "@Named(", "@Named\r" };
 	private static final String[] MANAGED_BEAN_NAME_DECLARATION_EXPRESSIONS = new String[] { "name\\s*=\\s*\"(\\w+)\"",
 			"value\\s*=\\s*\"(\\w+)\"", "\\(\\\"(\\w+)\\\"\\)" };
 }
