@@ -60,7 +60,6 @@ public class JsonStrategyForDGraph implements IToString {
 			if (file.getCallees().size() > 0 || file.getCallers().size() > 0) {
 				JSONObject obj = new JSONObject();
 				obj.put("name", file.getNodeName() + "[" + file.getId() + "]");
-
 				if (file instanceof ClassNode)
 					obj.put("type", "class");
 				else if (file instanceof ConfigurationNode)

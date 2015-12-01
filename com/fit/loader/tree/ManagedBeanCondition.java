@@ -12,7 +12,7 @@ public class ManagedBeanCondition extends Condition {
 		if (n instanceof ClassNode) {
 			try {
 				String fileContent = Utils.readFileContent(n.getPath());
-				if (fileContent.indexOf("@ManagedBean")!=-1){
+				if (containMbAnnotation(fileContent)) {
 					return true;
 				}
 			} catch (IOException e) {
@@ -21,4 +21,13 @@ public class ManagedBeanCondition extends Condition {
 		}
 		return false;
 	}
+
+	private boolean containMbAnnotation(String fileContent) {
+		for (String mbAnnotation : MANAGED_BEAN_ANNOTATIONS)
+			if (fileContent.contains(mbAnnotation))
+				return true;
+		return false;
+	}
+
+	private static final String[] MANAGED_BEAN_ANNOTATIONS = new String[] { "@ManagedBean(", "@Named(", "@Named\n" };
 }

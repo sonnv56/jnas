@@ -148,4 +148,14 @@ public class Utils {
 		}
 		return null;
 	}
+
+	public static boolean openDefaultBrowser(String url) {
+		Runtime rt = Runtime.getRuntime();
+		try {
+			rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
 }

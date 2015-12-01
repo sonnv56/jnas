@@ -6,12 +6,12 @@ import com.fit.object.ProjectNode;
 import com.fit.process.DependencyGeneration;
 import com.fit.process.tostring.IToString;
 import com.fit.process.tostring.JsonStrategyForDGraph;
-import com.fit.process.tostring.JsonStrategyForHung;
+import com.fit.process.tostring.NodeDescriptionGeneration;
 import com.fit.process.tostring.TreeStrategy;
 import com.fit.util.Utils;
 
 /**
- * Ham tien xu li cay chuan bi cho qua trinh xu li CIA
+ * Ham tien xu li cay chuan bi cho qua trinh xu li CIA.
  * 
  * @author DucAnh
  *
@@ -33,5 +33,9 @@ public class Preprocess {
 		/** Json generation for dependency graph */
 		JsonStrategyForDGraph dGraphJson = new JsonStrategyForDGraph(projectRootNode);
 		Utils.writeContentToFile(dGraphJson.getString(), ConfigurationOfAnh.DEFAULT_JSON_PATH_FOR_DEPENDENCY_GRAPH);
+		NodeDescriptionGeneration nodeDescription = new NodeDescriptionGeneration(projectRootNode);
+		
+		/** view dependency graph */
+		Utils.openDefaultBrowser("http://localhost/graph.php");
 	}
 }

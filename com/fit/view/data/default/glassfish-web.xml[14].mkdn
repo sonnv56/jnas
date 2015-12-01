@@ -1,0 +1,1 @@
+C:\Users\DucAnh\Dropbox\Workspace\JSF test\dukes-forest\dukes-payment\build\web\WEB-INF\glassfish-web.xml

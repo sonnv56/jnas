@@ -20,13 +20,13 @@ public class DependencyGeneration {
 		List<Dependency> dependenciesList = new JSFParser(projectRootNode).getDependenciesList();
 		TreeUpdater.createConnection(dependenciesList);
 		/** CDI parser here */
-		CDIProcessor processor = new CDIProcessor();
-		processor.setProjectNode((ProjectNode) projectRootNode);
-
-		processor.process();
+//		CDIProcessor processor = new CDIProcessor();
+//		processor.setProjectNode((ProjectNode) projectRootNode);
+//
+//		processor.process();
 
 		/** Web service parser here */
-		WebServiceProcessor wsp = new WebServiceProcessor((ProjectNode) projectRootNode);
-		wsp.process();
+//		WebServiceProcessor wsp = new WebServiceProcessor((ProjectNode) projectRootNode);
+//		wsp.process();
 	}
 }
