@@ -216,8 +216,8 @@ public class CallGraph {
 		vertexes.addAll(graph.vertexSet());
 		int numOfMethod = vertexes.size();
 		System.out.println("numOfMethod: " + numOfMethod );
-		addToChangeSet(430);
-		addToChangeSet(411);
+//		addToChangeSet(430);
+//		addToChangeSet(411);
 
     }
 }

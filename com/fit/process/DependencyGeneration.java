@@ -8,8 +8,6 @@ import com.fit.process.cdi.CDIProcessor;
 import com.fit.process.jsf.JSFParser;
 import com.fit.process.jsf.TreeUpdater;
 import com.fit.process.jsf.object.Dependency;
-import com.fit.process.tostring.IToString;
-import com.fit.process.tostring.TreeStrategy;
 import com.fit.process.ws.WebServiceProcessor;
 
 public class DependencyGeneration {

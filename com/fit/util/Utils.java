@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -157,5 +158,20 @@ public class Utils {
 		} catch (IOException e) {
 			return false;
 		}
+	}
+
+	public static List<Node> createRandomChangeSet(List<Node> nodes, int sizeOfChangeSet) {
+		List<Node> output = new ArrayList<Node>();
+
+		while (output.size() != sizeOfChangeSet)
+			for (Node n : nodes)
+				if (!output.contains(n)) {
+					if (new Random().nextInt(13) % 3 == 0) {
+						output.add(n);
+						if (output.size() == sizeOfChangeSet)
+							break;
+					}
+				}
+		return output;
 	}
 }

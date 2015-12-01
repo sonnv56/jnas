@@ -76,6 +76,13 @@ public class WaveAlgorithm implements IComputeImpactSet {
 		});
 	}
 
+	/**
+	 * 
+	 * @param nodes
+	 *            Danh sach tap node trong dependency graph ma gay phu
+	 *            thuoc/chiu su phu thuoc
+	 * @param changeSet 
+	 */
 	public WaveAlgorithm(List<Node> nodes, List<Node> changeSet) {
 		this.nodes_ = nodes;
 		this.changeSet_ = changeSet;
