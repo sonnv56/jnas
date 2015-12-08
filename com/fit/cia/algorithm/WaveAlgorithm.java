@@ -25,7 +25,8 @@ public class WaveAlgorithm implements IComputeImpactSet {
 	private static List<Node> nodes_ = new ArrayList<>();
 	/** Danh sach tap change set */
 	private static List<Node> changeSet_ = new ArrayList<>();
-
+	private static CallGraph cg;
+	
 	private static void createAndShowGui() {
 		CallGraph cg = new CallGraph(nodes_, changeSet_);
 		cg.createRandomChangeSet();
@@ -92,11 +93,14 @@ public class WaveAlgorithm implements IComputeImpactSet {
 	@Override
 	public void compute() {
 		// do something else
-		CallGraph cg = new CallGraph(nodes_, changeSet_);
+		cg = new CallGraph(nodes_, changeSet_);
 		cg.createRandomChangeSet();
 		cg.calculateImpactSet();
 		System.out.println(cg.changeSetToString());
 		System.out.println(cg.coreToString());
 		System.out.println(cg.impactSetToString());
+	}
+	public ArrayList<String> getImpactSet() {
+		return cg.getImpactSet();
 	}
 }

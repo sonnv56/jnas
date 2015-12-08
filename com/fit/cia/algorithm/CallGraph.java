@@ -192,7 +192,10 @@ public class CallGraph {
     		ret += (n + "\n") ;
     	}
     	return ret;
-    }    
+    }
+    public ArrayList<String> getImpactSet() {
+		return impactSet;
+	}
     public String coreToString(){
     	String ret = new String();
     	ret += core.size() + " nodes in Core: \n";
