@@ -1,4 +1,4 @@
-package com.fit.process.totree;
+package com.fit.cia.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,16 +18,16 @@ import com.fit.util.Utils;
  * @author DucAnh
  *
  */
-public class DependencyGeneration implements IJsonParser {
+public class JsonDependencyParser implements IJsonParser {
 	private String content_ = "";
 	private List<Node> nodes_ = new ArrayList<>();
 
 	public static void main(String[] args) {
 		String path = "C:\\Dependency.json";
-		new DependencyGeneration(path).display();
+		new JsonDependencyParser(path).display();
 	}
 
-	public DependencyGeneration(String dependencyPath) {
+	public JsonDependencyParser(String dependencyPath) {
 		try {
 			content_ = Utils.readFileContent(dependencyPath);
 			parse();
